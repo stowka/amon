@@ -2,7 +2,7 @@
  * server.js
  * @author Antoine De Gieter
  * @copyright Net Production Köbe & Co
- * @digest starts the server and listen on port 8989
+ * @digest starts the server and listens on port 8989
  */
 var http = require('http');
 var url = require('url');
