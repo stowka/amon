@@ -3,6 +3,10 @@
  * @author Antoine De Gieter
  * @copyright Net Production Köbe & Co
  * @digest database handler
+ *
+ * @see https://github.com/coopernurse/node-pool
+ * @see https://github.com/felixge/node-mysql/
+ * @see https://nodejs.org/api/events.html
  */
 
 /*
