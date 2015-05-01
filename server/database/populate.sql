@@ -40,26 +40,27 @@ INSERT INTO payment_method VALUES (null);
 INSERT INTO payment_method_translation VALUES (null, "Carte Bancaire", "fr-CH", 1);
 INSERT INTO payment_method_translation VALUES (null, "Credit Card", "en-UK", 1);
 
+----------------- currency ---------------------------------------
+INSERT INTO currency VALUES (null, "€");
+INSERT INTO currency VALUES (null, "CHF");
+
+---------------- currency_translation ----------------------------
+INSERT INTO currency_translation VALUES (null, 1, "fr-CH", "Euros");
+INSERT INTO currency_translation VALUES (null, 1, "en-UK", "Euros");
+INSERT INTO currency_translation VALUES (null, 2, "fr-CH", "Francs Suisses");
+INSERT INTO currency_translation VALUES (null, 2, "en-UK", "Swiss Francs");
+
+
 ----------------- misc -------------------------------------------
--- TODO 
 
 ----------------- detail -------------------------------------------
-INSERT INTO detail VALUES (null, 10, 1, 2000, 1);
-INSERT INTO detail VALUES (null, 10, 1, 400, 2);
-INSERT INTO detail VALUES (null, 10, 1, 250, 3);
-
-
------------------ detail_translation --------------------------------
-INSERT INTO detail_translation VALUES (null, 1, "fr-CH", "Application : Accueil");
-INSERT INTO detail_translation VALUES (null, 1, "en-UK", "Application : Home");
-INSERT INTO detail_translation VALUES (null, 2, "fr-CH", "Application : À Propos");
-INSERT INTO detail_translation VALUES (null, 2, "en-UK", "Application : About");
-INSERT INTO detail_translation VALUES (null, 3, "fr-CH", "Application : Paiement");
-INSERT INTO detail_translation VALUES (null, 3, "en-UK", "Application : Billing");
-
+INSERT INTO detail VALUES (null, "Application : Accueil", 10, 1, 2000, 1);
+INSERT INTO detail VALUES (null, "Application : À Propos", 10, 1, 400, 2);
+INSERT INTO detail VALUES (null, "Application : Paiement", 10, 1, 250, 3);
 
 ----------------- quotation --------------------------------------
-INSERT INTO quotation VALUES ("D/26", "Refonte complète du site internet www.arrowstudio.ch", 1, 3, 1);
+INSERT INTO quotation VALUES ("D/26", "Refonte complète du site internet
+    www.arrowstudio.ch", 1, 3, 1, 2, "2015-05-01", "2015-06-01");
 
 
 ----------------- quotation_detail ----------------------------------------

@@ -65,12 +65,12 @@ CREATE TABLE language (
     `code`  VARCHAR(5),
     `label` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
 CREATE TABLE title (
     `id` INT AUTO_INCREMENT,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE title_translation (
     `id`       INT AUTO_INCREMENT,
@@ -84,7 +84,7 @@ CREATE TABLE title_translation (
     CONSTRAINT `fk_title_translation_language`
         FOREIGN KEY (`language`)
         REFERENCES language(`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE contact (
 	`id`         INT AUTO_INCREMENT,
@@ -97,14 +97,14 @@ CREATE TABLE contact (
     CONSTRAINT `fk_contact_title`
         FOREIGN KEY (`title`)
         REFERENCES title(`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE phone (
 	`id`           INT AUTO_INCREMENT,
 	`country_code` VARCHAR(3) NOT NULL,
 	`number`       VARCHAR(15) NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE has_phone (
 	`contact` INT NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE team (
 	`id`   INT AUTO_INCREMENT,
 	`name` VARCHAR(15) NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 LOCK TABLES team WRITE;
 INSERT INTO team (name)
@@ -154,7 +154,7 @@ CREATE TABLE user (
 		REFERENCES contact(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE membership (
 	`user` INT NOT NULL,
@@ -176,7 +176,7 @@ CREATE TABLE access_key (
 	`id`   INT AUTO_INCREMENT,
 	`name` VARCHAR(15) NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE user_access (
 	`id`         INT AUTO_INCREMENT,
@@ -195,7 +195,7 @@ CREATE TABLE user_access (
 		REFERENCES access_key(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 -- Triggers
 /*DELIMITER $$
@@ -223,7 +223,7 @@ CREATE TABLE project (
 	`short_description` VARCHAR(63) DEFAULT "",
 	`long_description`  VARCHAR(2047) DEFAULT "",
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE subproject (
 	`id`          INT AUTO_INCREMENT,
@@ -243,7 +243,7 @@ CREATE TABLE subproject (
 		REFERENCES tag(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE collaborator (
 	`user`       INT NOT NULL,
@@ -320,7 +320,7 @@ CREATE TABLE task (
 		REFERENCES user(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 --
 -- task manager
 -- END
@@ -333,21 +333,22 @@ CREATE TABLE task (
 CREATE TABLE misc (
     `keyword` VARCHAR(25),
     PRIMARY KEY (`keyword`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE payment_method (
     `id` INT AUTO_INCREMENT,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE detail (
-    `id`       INT AUTO_INCREMENT,
-    `discount` FLOAT NOT NULL,
-    `quantity` INT NOT NULL,
-    `price`    FLOAT NOT NULL,
-    `line`     INT NOT NULL,
+    `id`          INT AUTO_INCREMENT,
+    `description` TEXT,
+    `discount`    FLOAT NOT NULL,
+    `quantity`    INT NOT NULL,
+    `price`       FLOAT NOT NULL,
+    `line`        INT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE payment_method_translation (
     `id`             INT AUTO_INCREMENT,
@@ -361,28 +362,37 @@ CREATE TABLE payment_method_translation (
     CONSTRAINT `fl_payment_method_translation_language`
         FOREIGN KEY (`language`)
         REFERENCES language(`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
-CREATE TABLE detail_translation (
-    `id`       INT AUTO_INCREMENT,
-    `detail`   INT NOT NULL,
-    `language` VARCHAR(5),
-    `label`    VARCHAR(100),
+CREATE TABLE currency (
+    `id`     INT NOT NULL AUTO_INCREMENT,
+    `symbol` VARCHAR(5),
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
+
+CREATE TABLE currency_translation (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `currency` INT NOT NULL,
+    `language` VARCHAR(5) NOT NULL,
+    `name`     VARCHAR(25) NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT `fk_detail_translation_detail`
-        FOREIGN KEY (`detail`)
-        REFERENCES detail(`id`),
-    CONSTRAINT `fk_detail_translation_language`
+    CONSTRAINT `fk_currency_translation_currency`
+        FOREIGN KEY (`currency`)
+        REFERENCES currency(`id`),
+    CONSTRAINT `fk_currency_translation_language`
         FOREIGN KEY (`language`)
         REFERENCES language(`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE quotation (
-    `id`             VARCHAR(10),
-    `summary`        VARCHAR(150),
-    `vendor`         INT NOT NULL,
-    `customer`       INT NOT NULL,
-    `payment_method` INT NOT NULL,
+    `id`               VARCHAR(10),
+    `summary`          VARCHAR(150),
+    `vendor`           INT NOT NULL,
+    `customer`         INT NOT NULL,
+    `payment_method`   INT NOT NULL,
+    `currency`         INT NOT NULL,
+    `date_of_creation` DATE,
+    `date_of_validity` DATE,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_quotation_vendor_contact`
         FOREIGN KEY (`vendor`)
@@ -392,8 +402,11 @@ CREATE TABLE quotation (
         REFERENCES contact(`id`),
     CONSTRAINT `fk_quotation_payment_method`
         FOREIGN KEY (`payment_method`)
-        REFERENCES payment_method(`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+        REFERENCES payment_method(`id`),
+    CONSTRAINT `fk_quotation_currency`
+        FOREIGN KEY (`currency`)
+        REFERENCES currency(`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE quotation_detail (
     `quotation` VARCHAR(10),
@@ -405,7 +418,7 @@ CREATE TABLE quotation_detail (
     CONSTRAINT `fk_quotation_detail_detail`
         FOREIGN KEY (`detail`)
         REFERENCES detail(`id`)  
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 --
 -- quotation
 -- END
