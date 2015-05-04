@@ -33,6 +33,14 @@ INSERT INTO contact VALUES (null, 1, "Antoine", "De Gieter",
     "antoine.degieter@net-production.ch", "Montrinsans route de Malpas, 25160
     Labergement Sainte-Marie, FRANCE");
 
+------------------ phone ------------------------------------------
+INSERT INTO phone VALUES (null, 41, "79 193 33 09");
+INSERT INTO phone VALUES (null, 41, "77 124 21 84");
+
+------------------ contact_phone ----------------------------------
+INSERT INTO contact_phone VALUES (1,1);
+INSERT INTO contact_phone VALUES (3,2);
+
 ----------------- payment_method ----------------------------------
 INSERT INTO payment_method VALUES (null);
 
@@ -50,8 +58,37 @@ INSERT INTO currency_translation VALUES (null, 1, "en-UK", "Euros");
 INSERT INTO currency_translation VALUES (null, 2, "fr-CH", "Francs Suisses");
 INSERT INTO currency_translation VALUES (null, 2, "en-UK", "Swiss Francs");
 
-
 ----------------- misc -------------------------------------------
+INSERT INTO misc VALUES ("quotation", "fr-CH", "Devis");
+INSERT INTO misc VALUES ("quotation", "en-UK", "Quotation");
+INSERT INTO misc VALUES ("validity", "fr-CH", "Date limite de validité");
+INSERT INTO misc VALUES ("validity", "en-UK", "Valid until");
+INSERT INTO misc VALUES ("currency", "fr-CH", "Devise");
+INSERT INTO misc VALUES ("currency", "en-UK", "Currency");
+
+INSERT INTO misc VALUES ("description", "fr-CH", "Désignation");
+INSERT INTO misc VALUES ("description", "en-UK", "Description");
+INSERT INTO misc VALUES ("discount", "fr-CH", "Réduction");
+INSERT INTO misc VALUES ("discount", "en-UK", "Discount");
+INSERT INTO misc VALUES ("quantity", "fr-CH", "Quantité");
+INSERT INTO misc VALUES ("quantity", "en-UK", "Quantity");
+INSERT INTO misc VALUES ("price", "fr-CH", "Prix");
+INSERT INTO misc VALUES ("price", "en-UK", "Price");
+INSERT INTO misc VALUES ("total", "fr-CH", "Total HT");
+INSERT INTO misc VALUES ("total", "en-UK", "Total excl tax");
+
+INSERT INTO misc VALUES ("payment_method", "fr-CH", "Mode de règlement");
+INSERT INTO misc VALUES ("payment_method", "en-UK", "Payment method");
+INSERT INTO misc VALUES ("to_pay", "fr-CH", "À payer");
+INSERT INTO misc VALUES ("to_pay", "en-UK", "To pay");
+INSERT INTO misc VALUES ("vendor", "fr-CH", "Vendeur");
+INSERT INTO misc VALUES ("vendor", "en-UK", "Vendor");
+INSERT INTO misc VALUES ("customer", "fr-CH", "Client");
+INSERT INTO misc VALUES ("customer", "en-UK", "Customer");
+INSERT INTO misc VALUES ("signature", "fr-CH", "Date et signature précédées de
+    la mention 'Bon pour accord'");
+INSERT INTO misc VALUES ("signature", "en-UK", "Date and signature preceded by
+    the words 'Signed as agreed'");
 
 ----------------- detail -------------------------------------------
 INSERT INTO detail VALUES (null, "Application : Accueil", 10, 1, 2000, 1);

@@ -106,21 +106,59 @@ CREATE TABLE phone (
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
-CREATE TABLE has_phone (
+CREATE TABLE contact_phone (
 	`contact` INT NOT NULL,
 	`phone`   INT NOT NULL,
 	PRIMARY KEY (`contact`, `phone`),
-	CONSTRAINT `fk_has_phone_contact`
+	CONSTRAINT `fk_contact_phone_contact`
 		FOREIGN KEY (`contact`)
 		REFERENCES contact(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
-	CONSTRAINT `fk_has_phone_phone`
+	CONSTRAINT `fk_contact_phone_phone`
 		FOREIGN KEY (`phone`)
 		REFERENCES phone(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
+
+CREATE TABLE company (
+    `id`      INT NOT NULL AUTO_INCREMENT,
+    `name`    VARCHAR(100) NOT NULL,
+    `address` VARCHAR(100) NOT NULL,
+    `email`   VARCHAR(100) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
+
+CREATE TABLE works_for (
+    `contact` INT NOT NULL,
+    `company` INT NOT NULL,
+    PRIMARY KEY (`contact`, `company`),
+    CONSTRAINT `fk_works_for_contact`
+        FOREIGN KEY (`contact`)
+        REFERENCES contact(`id`),
+    CONSTRAINT `fk_works_for_company`
+        FOREIGN KEY (`company`)
+        REFERENCES company(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET="utf8";
+
+CREATE TABLE company_phone (
+	`company` INT NOT NULL,
+	`phone`   INT NOT NULL,
+	PRIMARY KEY (`company`, `phone`),
+	CONSTRAINT `fk_company_phone_company`
+		FOREIGN KEY (`company`)
+		REFERENCES contact(`id`)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT `fk_company_phone_phone`
+		FOREIGN KEY (`phone`)
+		REFERENCES phone(`id`)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET="utf8";
+
+
 -- 
 -- address book
 -- END
@@ -331,8 +369,13 @@ CREATE TABLE task (
 --
 
 CREATE TABLE misc (
-    `keyword` VARCHAR(25),
-    PRIMARY KEY (`keyword`)
+    `keyword`  VARCHAR(25),
+    `language` VARCHAR(5),
+    `text`     VARCHAR(100),
+    PRIMARY KEY (`keyword`, `language`),
+    CONSTRAINT `fk_misc_language`
+        FOREIGN KEY (`language`)
+        REFERENCES language(`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE payment_method (
