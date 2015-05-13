@@ -4,14 +4,42 @@
  * @copyright Net Production Köbe & Co
  * @digest starts the server and listens on port 8989
  */
-var http = require('http');
-var url = require('url');
+var express = require('express');
+var path = require('path');
+var logger = require('morgan');
 
-var server = http.createServer(function(req, res) {
-	var page = url.parse(req.url).pathname;
-	console.log(page);
-	res.writeHead(200, {"Content-Type": "application/json"});
-	res.end("{}");
+var routesQuotation = require('./routes/quotation');
+
+var server = express();
+
+server.set('view engine', 'jade');
+
+server.use(logger('dev'));
+
+server.use('/quotation', routesQuotation);
+
+// catch 404 and forward to error handler
+server.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
-server.listen(8989);
+// error handler development
+if (server.get('env') === 'development') {
+    server.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.send('Error : ' + err.message);
+    });
+}
+
+// error handler production
+server.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('Error : ' + err.message)
+});
+
+server.listen(8989, function() {
+    console.log('Server is running on port 8989');
+    console.log('Press Ctrl-C to kill the server');
+});

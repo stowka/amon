@@ -8,6 +8,8 @@ DROP DATABASE IF EXISTS `AMON`;
 CREATE DATABASE `AMON` CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `AMON`;
 
+SET autocommit = 0;
+
 --
 -- Procedures
 --
@@ -384,8 +386,8 @@ CREATE TABLE payment_method (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE detail (
-    `id`          INT AUTO_INCREMENT,
-    `description` TEXT,
+    `id`          INT NOT NULL AUTO_INCREMENT,
+    `description` TEXT NOT NULL,
     `discount`    FLOAT NOT NULL,
     `quantity`    INT NOT NULL,
     `price`       FLOAT NOT NULL,
@@ -428,14 +430,14 @@ CREATE TABLE currency_translation (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE quotation (
-    `id`               VARCHAR(10),
-    `summary`          VARCHAR(150),
+    `id`               INT NOT NULL AUTO_INCREMENT,
+    `summary`          VARCHAR(150) NOT NULL,
     `vendor`           INT NOT NULL,
     `customer`         INT NOT NULL,
     `payment_method`   INT NOT NULL,
     `currency`         INT NOT NULL,
-    `date_of_creation` DATE,
-    `date_of_validity` DATE,
+    `date_of_creation` DATE NOT NULL,
+    `date_of_validity` DATE NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_quotation_vendor_contact`
         FOREIGN KEY (`vendor`)
@@ -452,16 +454,22 @@ CREATE TABLE quotation (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE quotation_detail (
-    `quotation` VARCHAR(10),
+    `quotation` INT,
     `detail`    INT,
     PRIMARY KEY (`quotation`, `detail`),
     CONSTRAINT `fk_quotation_detail_quotation`
         FOREIGN KEY (`quotation`)
-        REFERENCES quotation(`id`),
+        REFERENCES quotation(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
     CONSTRAINT `fk_quotation_detail_detail`
         FOREIGN KEY (`detail`)
-        REFERENCES detail(`id`)  
+        REFERENCES detail(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
+
+
 --
 -- quotation
 -- END

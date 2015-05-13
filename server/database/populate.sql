@@ -21,8 +21,7 @@ INSERT INTO title_translation VALUES (null, "Mrs.", "en-UK", 2);
 
 ----------------- contact -----------------------------------------
 INSERT INTO contact VALUES (null, 1, "Oday", "Yehia",
-    "oday.yehia@net-production.ch", "Avenue de la Chablière 24, 1003 Lausanne,
-    SUISSE");
+    "oday.yehia@net-production.ch", "Avenue de la Chablière 24, 1003 Lausanne, SUISSE");
 INSERT INTO contact VALUES (null, 1, "Nathan", "Köbe",
     "nathan.kobe@net-production.ch", "address");
 INSERT INTO contact VALUES (null, 2, "Mélanie", "Begg", "email@email",
@@ -30,8 +29,7 @@ INSERT INTO contact VALUES (null, 2, "Mélanie", "Begg", "email@email",
 INSERT INTO contact VALUES (null, 1, "François-Xavier", "Béligat",
     "beligat.fx@gmail.com", "12 rue de la Basilique, 25000 Besançon, FRANCE");
 INSERT INTO contact VALUES (null, 1, "Antoine", "De Gieter",
-    "antoine.degieter@net-production.ch", "Montrinsans route de Malpas, 25160
-    Labergement Sainte-Marie, FRANCE");
+    "antoine.degieter@net-production.ch", "Montrinsans route de Malpas, 25160 Labergement Sainte-Marie, FRANCE");
 
 ------------------ phone ------------------------------------------
 INSERT INTO phone VALUES (null, 41, "79 193 33 09");
@@ -85,10 +83,10 @@ INSERT INTO misc VALUES ("vendor", "fr-CH", "Vendeur");
 INSERT INTO misc VALUES ("vendor", "en-UK", "Vendor");
 INSERT INTO misc VALUES ("customer", "fr-CH", "Client");
 INSERT INTO misc VALUES ("customer", "en-UK", "Customer");
-INSERT INTO misc VALUES ("signature", "fr-CH", "Date et signature précédées de
-    la mention 'Bon pour accord'");
-INSERT INTO misc VALUES ("signature", "en-UK", "Date and signature preceded by
-    the words 'Signed as agreed'");
+INSERT INTO misc VALUES ("signature", "fr-CH", 
+    "Date et signature précédées de la mention 'Bon pour accord'");
+INSERT INTO misc VALUES ("signature", "en-UK", 
+    "Date and signature preceded by the words 'Signed as agreed'");
 
 ----------------- detail -------------------------------------------
 INSERT INTO detail VALUES (null, "Application : Accueil", 10, 1, 2000, 1);
@@ -96,14 +94,14 @@ INSERT INTO detail VALUES (null, "Application : À Propos", 10, 1, 400, 2);
 INSERT INTO detail VALUES (null, "Application : Paiement", 10, 1, 250, 3);
 
 ----------------- quotation --------------------------------------
-INSERT INTO quotation VALUES ("D/26", "Refonte complète du site internet
-    www.arrowstudio.ch", 1, 3, 1, 2, "2015-05-01", "2015-06-01");
+INSERT INTO quotation VALUES (null, "Refonte complète du site internet www.arrowstudio.ch", 
+    1, 3, 1, 2, "2015-05-01", "2015-06-01");
 
 
 ----------------- quotation_detail ----------------------------------------
-INSERT INTO quotation_detail VALUES ("D/26", 1);
-INSERT INTO quotation_detail VALUES ("D/26", 2);
-INSERT INTO quotation_detail VALUES ("D/26", 3);
+INSERT INTO quotation_detail VALUES (1, 1);
+INSERT INTO quotation_detail VALUES (1, 2);
+INSERT INTO quotation_detail VALUES (1, 3);
 
 ----------------- access_key ----------------------------------------------
 INSERT INTO access_key VALUES (null, "users_and_roles");
