@@ -86,7 +86,7 @@ module.exports = {
             //HTML to PDF
             var pdf = require('html-pdf');
             var options = {
-                filename: 'fr_devis.pdf',
+                filename: 'quotation_' + id + '.pdf',
                 format : 'letter'
             };
             pdf.create(html, options).toFile(function(err, res) {
@@ -200,7 +200,7 @@ function formatDate(date, lang) {
 
 function generateHTML(data) {
     var jade = require('jade');
-    var template = jade.compileFile('bundles/quotation/devis.jade');
+    var template = jade.compileFile('bundles/quotation/quotation.jade');
     var html = template(data);
     return html;
 }
