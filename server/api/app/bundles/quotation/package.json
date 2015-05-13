@@ -1,0 +1,22 @@
+{
+  "name": "quotation",
+  "version": "1.0.0",
+  "description": "CRUD on quotation",
+  "main": "quotation.js",
+  "dependencies": {
+    "html-pdf": "^1.2.0",
+    "jade": "^1.9.2",
+    "mysql": "^2.6.2",
+    "jsreport": "^0.4.0",
+    "promise": "^7.0.1",
+    "node-mysql": "^0.4.2",
+    "pdfkit": "^0.7.1",
+    "pdfkitjs": "^0.0.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "François-Xavier Béligat",
+  "license": "ISC"
+}

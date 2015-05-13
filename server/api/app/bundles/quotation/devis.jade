@@ -1,0 +1,80 @@
+html
+    head
+        meta(charset="UTF-8")
+        style.
+            body {
+            }
+    body
+        div
+            h1= misc.quotation
+            h4 D/#{quotation.id}
+
+        div
+            img(src="http://www.net-production.ch/global/img/logos/logo-lg.png")
+
+        div
+            p
+                |Lausanne, #{quotation.date_of_creation}
+                br
+                = misc.validity + ' : ' +  quotation.date_of_validity
+                br
+                = misc.currency + ' : ' +  quotation.currency
+        div 
+            table
+                tr
+                    td 
+                        strong Net Production Köbe & co
+                    td= customer.title +' '+ customer.first_name +' '+ customer.last_name
+                tr
+                    td Avenue de la chablière 21B
+                    td= customer.address
+                tr
+                    td 1004 Lausanne, Suisse
+                    td= customer.email
+                tr
+                    td www.net-production.ch
+                    td= '+' + customer.country_code + ' (0) ' + customer.number
+                tr
+                    td= vendor.email
+                tr
+                    td= '+' + vendor.country_code + ' (0) ' + vendor.number
+        h3= quotation.summary
+        table
+            thead
+                th N°
+                th= misc.description
+                th= misc.discount
+                th= misc.quantity
+                th= misc.price
+                th= misc.total
+            tbody
+                each task in details
+                    tr
+                        td= task.line
+                        td= task.description
+                        td= task.discount + "%"
+                        td= task.quantity
+                        td= task.price
+                        td= task.total_ht
+                tr
+                    td
+                    td
+                    td
+                    td
+                    td Total :
+                    td= total 
+        div
+            h3= misc.to_pay + ' : ' + total + ' '  + quotation.currency_symbol
+            p= misc.payment_method + ' : ' + quotation.payment_method
+        div
+            table
+                tr
+                    td= misc.vendor
+                    td= misc.customer
+                tr
+                    td= vendor.title + ' ' + vendor.first_name + ' ' + vendor.last_name
+                    td= customer.title + ' ' + customer.first_name + ' ' + customer.last_name
+                tr
+                    td
+                    td= misc.signature
+
