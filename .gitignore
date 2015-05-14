@@ -3,3 +3,6 @@ node_modules
 
 # Pdf files
 *.pdf
+
+# Swap files
+*.swp

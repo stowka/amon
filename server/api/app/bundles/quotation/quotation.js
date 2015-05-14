@@ -49,10 +49,9 @@ module.exports = {
         var sqlDetail = 
             'SELECT D.line, D.description, D.discount, D.quantity, D.price, ' +
                 '(D.price * D.quantity * (1 - D.discount/100)) as total_ht ' +
-            'FROM quotation Q, detail D, quotation_detail QD ' +
-            'WHERE Q.id = ' + id + ' ' +
-            'AND   QD.quotation = Q.id ' +
-            'AND   QD.detail = D.id; '; 
+            'FROM quotation Q, detail D  ' +
+            'WHERE D.quotation = Q.id ' + 
+            'ORDER BY D.line;';
 
         var sqlMisc = 
             'SELECT * ' + 
@@ -103,6 +102,29 @@ module.exports = {
             }
         });
         
+        connection.end();
+    },
+
+    readAll: function(callback) {
+        var connection = connectToDatabase();
+
+        var sql = 'SELECT Q.id, Q.summary, Q.date_of_creation, ' +
+                  '       V.first_name as vendor_first_name, ' +
+                  '       V.last_name as vendor_last_name, ' +
+                  '       C.first_name as customer_first_name, ' +
+                  '       C.last_name as customer_last_game ' +
+                  'FROM quotation Q, contact V, contact C ' +
+                  'WHERE Q.vendor = V.id ' +
+                  'AND   Q.customer = C.id;';
+
+        connection.query(sql, function(err, results, fields) {
+            if (err) {
+                callback(false, err);
+            } else {
+                callback(true, {quotation : results});
+            }
+        });
+
         connection.end();
     },
 

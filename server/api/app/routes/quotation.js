@@ -6,6 +6,32 @@ var bodyParser = require('body-parser');
 
 router.use(bodyParser.urlencoded({extended: false}));
 
+router.get('/pdf/:filename', function(req, res, next) {
+    var filename = req.params.filename;
+
+    fs.readFile(filename, function(err, file) {
+        if (err) {
+            res.status(404);
+            res.json({errorCode : 1, error : "The file doesn't exist"});
+        } else {
+            res.writeHeader(200, {'contentType': 'application/pdf'});
+            res.end(file);
+        }
+    });
+});
+
+router.get('/read/all', function(req, res, next) {
+    quotation.readAll(function(success, data) {
+        if(success) {
+            res.status(200);
+            res.json(data);
+        } else {
+            res.status(400);
+            res.json(data);
+        }
+    });
+});
+
 router.get('/read/:id/:language', function(req, res, next) {
     var id = req.params.id;
     var language = req.params.language;

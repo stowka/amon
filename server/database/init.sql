@@ -212,16 +212,18 @@ CREATE TABLE membership (
 		ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
-CREATE TABLE access_key (
-	`id`   INT AUTO_INCREMENT,
-	`name` VARCHAR(15) NOT NULL,
+CREATE TABLE bundle (
+	`id`        INT AUTO_INCREMENT,
+	`key`       VARCHAR(15) NOT NULL,
+    `name`      VARCHAR(50) NOT NULL,
+    `activated` BOOLEAN DEFAULT FALSE,
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE user_access (
 	`id`         INT AUTO_INCREMENT,
 	`user`       INT NOT NULL,
-	`access_key` INT NOT NULL,
+	`bundle`     INT NOT NULL,
     `mode`       ENUM("f", "r", "w", "rw") DEFAULT "r" COMMENT "f=forbidden,
     r=read, w=write",
 	PRIMARY KEY (`id`),
@@ -230,9 +232,9 @@ CREATE TABLE user_access (
 		REFERENCES user(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
-	CONSTRAINT `fk_user_access_access_key`
-		FOREIGN KEY (`access_key`)
-		REFERENCES access_key(`id`)
+	CONSTRAINT `fk_user_access_bundle`
+		FOREIGN KEY (`bundle`)
+		REFERENCES bundle(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
@@ -385,16 +387,6 @@ CREATE TABLE payment_method (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
-CREATE TABLE detail (
-    `id`          INT NOT NULL AUTO_INCREMENT,
-    `description` TEXT NOT NULL,
-    `discount`    FLOAT NOT NULL,
-    `quantity`    INT NOT NULL,
-    `price`       FLOAT NOT NULL,
-    `line`        INT NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
-
 CREATE TABLE payment_method_translation (
     `id`             INT AUTO_INCREMENT,
     `label`          VARCHAR(25) NOT NULL,
@@ -453,20 +445,18 @@ CREATE TABLE quotation (
         REFERENCES currency(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
-CREATE TABLE quotation_detail (
-    `quotation` INT,
-    `detail`    INT,
-    PRIMARY KEY (`quotation`, `detail`),
-    CONSTRAINT `fk_quotation_detail_quotation`
+CREATE TABLE detail (
+    `id`          INT NOT NULL AUTO_INCREMENT,
+    `description` TEXT NOT NULL,
+    `discount`    FLOAT NOT NULL,
+    `quantity`    INT NOT NULL,
+    `price`       FLOAT NOT NULL,
+    `line`        INT NOT NULL,
+    `quotation`   INT NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_detail_quotation`
         FOREIGN KEY (`quotation`)
         REFERENCES quotation(`id`)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_quotation_detail_detail`
-        FOREIGN KEY (`detail`)
-        REFERENCES detail(`id`)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 
