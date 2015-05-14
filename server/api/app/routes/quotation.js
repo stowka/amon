@@ -10,12 +10,17 @@ router.get('/read/:id/:language', function(req, res, next) {
     var id = req.params.id;
     var language = req.params.language;
 
-    quotation.generatePdf(id, language, function(filename) {
-        fs.readFile(filename, function(err, file) {
-            if (err) throw err;
-            res.writeHeader(200, {'contentType' : 'application/pdf'});
-            res.end(file);
-        });
+    quotation.generatePdf(id, language, function(success, data) {
+        if(success) {
+            fs.readFile(data, function(err, file) {
+                if (err) throw err;
+                res.writeHeader(200, {'contentType' : 'application/pdf'});
+                res.end(file);
+            });
+        } else {
+            res.status = 404;
+            res.end(data);
+        }
     });
 });
 
@@ -37,11 +42,15 @@ router.get('/delete/:id', function(req, res, next) {
 
 
 router.post('/create', function(req, res) {
-    var params = [req.body.id, req.body.summary, req.body.vendor,
-                  req.body.customer, req.body.payment_method,
-                  req.body.currency];
+    var quotationData = {
+        summary        : req.body.summary,
+        vendor         : req.body.vendor,
+        customer       : req.body.customer,
+        payment_method : req.body.payment_method,
+        currency       : req.body.currency
+    };
 
-    quotation.store(params, function(success, err) {
+    quotation.storeQuotation(quotationData, function(success, err) {
         if(success) {
             res.sendStatus(200);
         } else {

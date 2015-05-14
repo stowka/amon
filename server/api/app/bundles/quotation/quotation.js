@@ -62,37 +62,45 @@ module.exports = {
         var sqlQuery = sqlQuotation + sqlVendor + sqlCustomer + sqlDetail + sqlMisc;
 
         connection.query(sqlQuery, function(err, results, fields) {
+            //Mysql error
             if(err) {
-                throw err;
+                callback(false, err);
             } 
 
-            var total = computeTotal(results[3]);
+            //If the quotation exists in the database
+            if(results[0].length > 0) {
 
-            //Date format
-            results[0][0].date_of_creation =
-                formatDate(results[0][0].date_of_creation, language);
-            results[0][0].date_of_validity =
-                formatDate(results[0][0].date_of_validity, language);
+                var total = computeTotal(results[3]);
 
-            var html = generateHTML({
-                'quotation' : results[0][0],
-                'vendor'    : results[1][0],
-                'customer'  : results[2][0],
-                'details'   : results[3],
-                'total'     : total,
-                'misc'      : wrapMiscObject(results[4])
-            });
+                //Date format
+                results[0][0].date_of_creation =
+                    formatDate(results[0][0].date_of_creation, language);
+                results[0][0].date_of_validity =
+                    formatDate(results[0][0].date_of_validity, language);
 
-            //HTML to PDF
-            var pdf = require('html-pdf');
-            var options = {
-                filename: 'quotation_' + id + '.pdf',
-                format : 'letter'
-            };
-            pdf.create(html, options).toFile(function(err, res) {
-                if (err) throw err;
-                callback(res.filename);
-            });
+                var html = generateHTML({
+                    'quotation' : results[0][0],
+                    'vendor'    : results[1][0],
+                    'customer'  : results[2][0],
+                    'details'   : results[3],
+                    'total'     : total,
+                    'misc'      : wrapMiscObject(results[4])
+                });
+
+                //HTML to PDF
+                var pdf = require('html-pdf');
+                var options = {
+                    filename: 'quotation_' + idQuotation + '.pdf',
+                    format : 'letter'
+                };
+                pdf.create(html, options).toFile(function(err, res) {
+                    if (err) throw err;
+                    callback(true, res.filename);
+                });
+            //If there is no quotation
+            } else {
+                callback(false, "No quotation found for this Id");
+            }
         });
         
         connection.end();
@@ -124,28 +132,20 @@ module.exports = {
         connection.end();
     },
 
-    store: function(params, callback) {
-        var today = new Date();
-        var validity = new Date();
-        validity.setDate(validity.getDate() + 30);
+    storeQuotation: function(quotation, callback) {
+        store(quotation, callback);
+    },
 
-        params.push(today);
-        params.push(validity);
-
-        var connection = connectToDatabase();
-
-        connection.query("INSERT INTO quotation VALUES (?,?,?,?,?,?,?,?);", params, 
-        function(err, results, fields) {
-            if (err) {
-                callback(false, err);
-            } else {
-                callback(true, null);
-            }
-        });
-
-        connection.end();
-    }
+    storeQuotationWithNewClient: function(quotation, client, callback) {
+        /*quotation.customer = TODO: Call to Contact bundle function that store the new client
+         *                        and return his id 
+         */
+        store(quotation, callback);
+    },
 };
+
+
+//private functions
 
 function connectToDatabase() {
     var mysql = require('mysql');
@@ -157,6 +157,26 @@ function connectToDatabase() {
     });
     connection.connect();
     return connection;
+}
+
+function store(quotation, callback) {
+    quotation.today = new Date();
+    quotation.validity = new Date();
+    quotation.validity.setDate(quotation.validity.getDate() + 30);
+
+    var connection = connectToDatabase();
+
+    connection.query("INSERT INTO quotation VALUES (null, ?,?,?,?,?,?,?);",
+    [quotation.summary, quotation.vendor, quotation.customer, quotation.payment_method,
+     quotation.currency, quotation.today, quotation.validity],
+    function(err, results, fields) {
+        if (err) {
+            callback(false, err);
+        } else {
+            callback(true, null);
+        }
+    });
+    connection.end();
 }
 
 function computeTotal(tasks) {
