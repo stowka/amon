@@ -430,6 +430,7 @@ CREATE TABLE quotation (
     `currency`         INT NOT NULL,
     `date_of_creation` DATE NOT NULL,
     `date_of_validity` DATE NOT NULL,
+    `language`         VARCHAR(5) NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_quotation_vendor_contact`
         FOREIGN KEY (`vendor`)
@@ -442,7 +443,10 @@ CREATE TABLE quotation (
         REFERENCES payment_method(`id`),
     CONSTRAINT `fk_quotation_currency`
         FOREIGN KEY (`currency`)
-        REFERENCES currency(`id`)
+        REFERENCES currency(`id`),
+    CONSTRAINT `fk_quotation_language`
+        FOREIGN KEY (`language`)
+        REFERENCES language(`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE detail (

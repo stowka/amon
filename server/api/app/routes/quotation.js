@@ -32,11 +32,10 @@ router.get('/read/all', function(req, res, next) {
     });
 });
 
-router.get('/read/:id/:language', function(req, res, next) {
+router.get('/read/:id', function(req, res, next) {
     var id = req.params.id;
-    var language = req.params.language;
 
-    quotation.generatePdf(id, language, function(success, data) {
+    quotation.generatePdf(id, function(success, data) {
         if(success) {
             res.status(200);
             res.json(data);
