@@ -1,4 +1,4 @@
-# NPM
+# Amon
 Net Production Manager
 
 ## Launch project 

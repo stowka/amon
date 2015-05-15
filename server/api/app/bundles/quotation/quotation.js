@@ -94,7 +94,13 @@ module.exports = {
                 };
                 pdf.create(html, options).toFile(function(err, res) {
                     if (err) throw err;
-                    callback(true, res.filename);
+                    var data = {
+                        'quotation' : results[0][0],
+                        'vendor'    : results[1][0],
+                        'customer'  : results[2][0],
+                        'details'   : results[3],
+                    };
+                    callback(true, data);
                 });
             //If there is no quotation
             } else {

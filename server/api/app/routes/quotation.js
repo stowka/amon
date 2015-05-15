@@ -6,8 +6,8 @@ var bodyParser = require('body-parser');
 
 router.use(bodyParser.urlencoded({extended: false}));
 
-router.get('/pdf/:filename', function(req, res, next) {
-    var filename = req.params.filename;
+router.get('/pdf/:id', function(req, res, next) {
+    var filename = 'quotation_' + req.params.id + '.pdf';
 
     fs.readFile(filename, function(err, file) {
         if (err) {
@@ -38,14 +38,11 @@ router.get('/read/:id/:language', function(req, res, next) {
 
     quotation.generatePdf(id, language, function(success, data) {
         if(success) {
-            fs.readFile(data, function(err, file) {
-                if (err) throw err;
-                res.writeHeader(200, {'contentType' : 'application/pdf'});
-                res.end(file);
-            });
+            res.status(200);
+            res.json(data);
         } else {
             res.status = 404;
-            res.end(data);
+            res.json(data);
         }
     });
 });
