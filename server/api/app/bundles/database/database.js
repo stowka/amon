@@ -23,67 +23,67 @@ var poolModule = require('generic-pool');
 var mysqlModule = require('mysql');
 
 var credentials = {
-	host: "127.0.0.1",
-	user: "root",
-	password: "",
-	database: "Amon"
+    host: "127.0.0.1",
+    user: "root",
+    password: "",
+    database: "Amon"
 }
 
 var pool = connect(credentials);
 
 module.exports = {
 
-	execute: function(query, data, callback) {
-		pool.acquire(function(err, client) {
-			if (err)
-				console.err(err);
-			else {
-				client.query(query, data, function(err, result) {
-					if (err)
-						throw err;
+    execute: function(query, data, callback) {
+        pool.acquire(function(err, client) {
+            if (err)
+                console.err(err);
+            else {
+                client.query(query, data, function(err, result) {
+                    if (err)
+                        throw err;
 
-					pool.release(client);
+                    pool.release(client);
 
-					if (callback)
-						callback(result);
-				});
-			}
-		});
-	}
+                    if (callback)
+                        callback(result);
+                });
+            }
+        });
+    }
 
 }
 
 function connect(credentials) {
-	return poolModule.Pool({
-		name	: 'mysql',
-		create	: function(callback) {
-			var c = mysqlModule.createConnection({
-				host		: credentials.host,
-				user		: credentials.user,
-				password	: credentials.password,
-				database	: credentials.database,
-        		multipleStatements : true
-			});
-			c.config.queryFormat = function (query, values) {
-				if (!values) 
-					return query;
-				
-				return query.replace(/\:(\w+)/g, function (txt, key) {
-					if (values.hasOwnProperty(key)) {
-						return this.escape(values[key]);
-					}
-					return txt;
-				}.bind(this));
-			};
-			c.connect();
-			callback(null, c);
-		},
-		destroy	: function(c) {
-			c.end();
-		},
-		max					: 10,
-		min					: 2,
-		idleTimeoutMillis	: 30000,
-		log					: false
-	});
+    return poolModule.Pool({
+        name    : 'mysql',
+        create  : function(callback) {
+            var c = mysqlModule.createConnection({
+                host        : credentials.host,
+                user        : credentials.user,
+                password    : credentials.password,
+                database    : credentials.database,
+                multipleStatements : true
+            });
+            c.config.queryFormat = function (query, values) {
+                if (!values) 
+                    return query;
+                
+                return query.replace(/\:(\w+)/g, function (txt, key) {
+                    if (values.hasOwnProperty(key)) {
+                        return this.escape(values[key]);
+                    }
+                    return txt;
+                }.bind(this));
+            };
+            c.connect();
+            callback(null, c);
+        },
+        destroy : function(c) {
+            c.end();
+        },
+        max                 : 10,
+        min                 : 2,
+        idleTimeoutMillis   : 30000,
+        log                 : false
+    });
 }

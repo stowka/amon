@@ -96,7 +96,7 @@ function checkSession(token, callback) {
 }
 
 function parseToken(token) {
-    if (regex = token.match(/^([0-9]+):([0-9a-z]{40}$)/))
+    if (regex = token.match(/^([1-9][0-9]*):([0-9a-z]{40}$)/))
         return {
             id: regex[1],
             hash: regex[2]

@@ -3,23 +3,51 @@ html
         meta(charset="UTF-8")
         style.
             body {
+                font-family: "Helvetica Neue", Arial, sans-serif;
+            }
+
+            .logo {
+                text-align: right;
+            }
+
+            header table {
+                width: 100%;
+            }
+
+            .quotation table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .quotation table thead th {
+                background-color: #efefef;
+                border: 1px solid #efefef;
+            }
+
+            .quotation table td {
+                border-bottom: 1px solid #efefef;
+                border-collapse: collapse;
             }
     body
-        div
-            h1= misc.quotation
-            h4 D/#{quotation.id}
+        header
+            table
+                tr
+                    td
+                        h1= misc.quotation
+                        h4 D/#{quotation.id}
+                    td
+                        div(class="logo")
+                            img(src="http://www.net-production.ch/global/img/logos/logo-lg.png" width="100px")
 
-        div
-            img(src="http://www.net-production.ch/global/img/logos/logo-lg.png")
-
-        div
+        div(class="infos")
             p
                 |Lausanne, #{quotation.date_of_creation}
                 br
                 = misc.validity + ' : ' +  quotation.date_of_validity
                 br
                 = misc.currency + ' : ' +  quotation.currency
-        div 
+        
+        div(class="contacts")
             table
                 tr
                     td 
@@ -38,31 +66,35 @@ html
                     td= vendor.email
                 tr
                     td= '+' + vendor.country_code + ' (0) ' + vendor.number
+
         h3= quotation.summary
-        table
-            thead
-                th N°
-                th= misc.description
-                th= misc.discount
-                th= misc.quantity
-                th= misc.price
-                th= misc.total
-            tbody
-                each task in details
+        div(class="quotation")
+            table
+                thead
                     tr
-                        td= task.line
-                        td= task.description
-                        td= task.discount + "%"
-                        td= task.quantity
-                        td= task.price
-                        td= task.total_ht
-                tr
-                    td
-                    td
-                    td
-                    td
-                    td Total :
-                    td= total 
+                        th N°
+                        th= misc.description
+                        th= misc.discount
+                        th= misc.quantity
+                        th= misc.price
+                        th= misc.total
+                
+                tbody
+                    each task in details
+                        tr
+                            td= task.line
+                            td= task.description
+                            td= task.discount + "%"
+                            td= task.quantity
+                            td= task.price
+                            td= task.total_ht
+                    tr
+                        td
+                        td
+                        td
+                        td
+                        td Total :
+                        td= total 
         div
             h3= misc.to_pay + ' : ' + total + ' '  + quotation.currency_symbol
             p= misc.payment_method + ' : ' + quotation.payment_method
