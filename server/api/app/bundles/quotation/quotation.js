@@ -1,24 +1,24 @@
 //Public functions
 module.exports = {
     
-    generatePdf: function (idQuotation, language, callback) {
+    generatePdf: function (idQuotation, callback) {
         var connection = connectToDatabase();
 
         var id = connection.escape(idQuotation);
-        var lang = connection.escape(language);
+        var lang = connection.escape('fr-CH');
 
         var sqlQuotation = 
             'SELECT Q.id, Q.summary, PMT.label as payment_method, C.symbol as currency_symbol, ' + 
-                'CT.name as currency, Q.date_of_creation, Q.date_of_validity ' + 
+                'CT.name as currency, Q.date_of_creation, Q.date_of_validity, Q.language ' + 
             'FROM quotation Q, payment_method PM, payment_method_translation PMT, currency C, ' +
                 'currency_translation CT ' +
             'WHERE Q.id = ' + id + ' ' +
             'AND   Q.payment_method = PM.id ' +
             'AND   PMT.payment_method = PM.id ' +
-            'AND   PMT.language = ' + lang + ' ' +
+            'AND   PMT.language = Q.language ' + 
             'AND   Q.currency = C.id ' + 
             'AND   CT.currency = C.id ' +
-            'AND   CT.language = ' + lang +'; ';
+            'AND   CT.language = Q.language;';
 
         var sqlCustomer = 
             'SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, ' +
@@ -29,7 +29,7 @@ module.exports = {
             'AND   Q.customer = C.id ' +
             'AND   C.title = T.id ' +
             'AND   TT.title = T.id ' +
-            'AND   TT.language = ' + lang + ' ' +
+            'AND   TT.language = Q.language ' + 
             'AND   CP.contact = C.id ' + 
             'AND   CP.phone = P.id LIMIT 1; ';
 
@@ -42,7 +42,7 @@ module.exports = {
             'AND   Q.vendor = C.id ' +
             'AND   C.title = T.id ' +
             'AND   TT.title = T.id ' + 
-            'AND   TT.language = ' + lang + ' ' +
+            'AND   TT.language = Q.language ' +
             'AND   CP.contact = C.id ' +
             'AND   CP.phone = P.id LIMIT 1; ';
 
@@ -54,9 +54,10 @@ module.exports = {
             'ORDER BY D.line;';
 
         var sqlMisc = 
-            'SELECT * ' + 
-            'FROM misc ' + 
-            'WHERE language = ' + lang + '; ';
+            'SELECT M.keyword, M.text ' + 
+            'FROM misc M, quotation Q ' + 
+            'WHERE Q.id = ' + id + ' ' +
+            'AND   M.language = Q.language;';
 
         var sqlQuery = sqlQuotation + sqlVendor + sqlCustomer + sqlDetail + sqlMisc;
 
@@ -73,9 +74,9 @@ module.exports = {
 
                 //Date format
                 results[0][0].date_of_creation =
-                    formatDate(results[0][0].date_of_creation, language);
+                    formatDate(results[0][0].date_of_creation, results[0][0].language);
                 results[0][0].date_of_validity =
-                    formatDate(results[0][0].date_of_validity, language);
+                    formatDate(results[0][0].date_of_validity, results[0][0].language);
 
                 var html = generateHTML({
                     'quotation' : results[0][0],
@@ -94,7 +95,13 @@ module.exports = {
                 };
                 pdf.create(html, options).toFile(function(err, res) {
                     if (err) throw err;
-                    callback(true, res.filename);
+                    var data = {
+                        'quotation' : results[0][0],
+                        'vendor'    : results[1][0],
+                        'customer'  : results[2][0],
+                        'details'   : results[3],
+                    };
+                    callback(true, data);
                 });
             //If there is no quotation
             } else {
