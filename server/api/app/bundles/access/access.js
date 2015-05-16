@@ -50,7 +50,7 @@ module.exports = {
                 // TODO if (1 !== result.deletedRows) callback(false)
                 callback(true);
             });
-    }
+    },
 
     acceptRequest: function(token, bundle, method, callback) {
         token = parseToken(token);
