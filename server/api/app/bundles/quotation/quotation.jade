@@ -4,29 +4,64 @@ html
         style.
             body {
                 font-family: "Helvetica Neue", Arial, sans-serif;
+                padding: 24px;
             }
 
             .logo {
                 text-align: right;
             }
 
-            header table {
-                width: 100%;
-            }
-
-            .quotation table {
+            table {
                 width: 100%;
                 border-collapse: collapse;
+            }
+
+            th, td, p {
+                font-size: 0.8em;
+            }
+
+            .contacts {
+                font-size: 1em;
             }
 
             .quotation table thead th {
                 background-color: #efefef;
                 border: 1px solid #efefef;
+                font-size: 0.8em;
             }
 
             .quotation table td {
                 border-bottom: 1px solid #efefef;
                 border-collapse: collapse;
+                font-size: 0.8em;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .text-right {
+                text-align: right;
+            }
+
+            .text-left {
+                text-align: left;
+            }
+
+            .text-justify {
+                text-align: justify;
+            }
+
+            footer {
+                position: absolute;
+                bottom: 24px;
+                width: 100%;
+            }
+
+            footer h6 {
+                color: #888;
+                font-size: 0.5em;
+                text-align: center;
             }
     body
         header
@@ -34,79 +69,98 @@ html
                 tr
                     td
                         h1= misc.quotation
-                        h4 D/#{quotation.id}
+                        
+                        h3 D/#{quotation.id}
+                        
+                        h5
+                            |Lausanne, #{quotation.date_of_creation}
+                            br
+                            = misc.validity + ' : ' +  quotation.date_of_validity
+                            br
+                            = misc.currency + ' : ' +  quotation.currency
                     td
                         div(class="logo")
                             img(src="http://www.net-production.ch/global/img/logos/logo-lg.png" width="100px")
-
-        div(class="infos")
-            p
-                |Lausanne, #{quotation.date_of_creation}
-                br
-                = misc.validity + ' : ' +  quotation.date_of_validity
-                br
-                = misc.currency + ' : ' +  quotation.currency
         
+        div
+            hr
+
         div(class="contacts")
             table
                 tr
-                    td 
+                    td(class="text-left") 
                         strong Net Production Köbe & co
-                    td= customer.title +' '+ customer.first_name +' '+ customer.last_name
+                    td(class="text-right")= customer.title + ' ' + customer.first_name + ' ' + customer.last_name
                 tr
-                    td Avenue de la chablière 21B
-                    td= customer.address
+                    td(class="text-left") Avenue de la chablière 21 B
+                    td(class="text-right")= customer.address
                 tr
-                    td 1004 Lausanne, Suisse
-                    td= customer.email
+                    td(class="text-left") 1004 Lausanne, Suisse
+                    td(class="text-right")= customer.email
                 tr
-                    td www.net-production.ch
-                    td= '+' + customer.country_code + ' (0) ' + customer.number
+                    td(class="text-left") www.net-production.ch
+                    td(class="text-right")= '+' + customer.country_code + ' (0) ' + customer.number
                 tr
-                    td= vendor.email
+                    td(class="text-left")= vendor.email
                 tr
-                    td= '+' + vendor.country_code + ' (0) ' + vendor.number
+                    td(class="text-left")= '+' + vendor.country_code + ' (0) ' + vendor.number
 
-        h3= quotation.summary
+        hr
+
+        h4= quotation.summary
         div(class="quotation")
             table
                 thead
                     tr
-                        th N°
-                        th= misc.description
-                        th= misc.discount
-                        th= misc.quantity
-                        th= misc.price
-                        th= misc.total
+                        th(class="text-center") #
+                        th(class="text-left")= misc.description
+                        th(class="text-right")= misc.quantity
+                        th(class="text-right")= misc.price
+                        th(class="text-right")= misc.discount
+                        th(class="text-right")= misc.total
                 
                 tbody
                     each task in details
                         tr
-                            td= task.line
-                            td= task.description
-                            td= task.discount + "%"
-                            td= task.quantity
-                            td= task.price
-                            td= task.total_ht
+                            td(class="text-center")= task.line
+                            td(class="text-left")= task.description
+                            td(class="text-right")= task.quantity
+                            td(class="text-right")= task.price
+                            td(class="text-right")= task.discount + "%"
+                            td(class="text-right")= task.total_ht
                     tr
                         td
                         td
                         td
                         td
-                        td Total :
-                        td= total 
+                        td(class="text-right")
+                            strong Total :
+                        td(class="text-right")
+                            strong= total 
         div
-            h3= misc.to_pay + ' : ' + total + ' '  + quotation.currency_symbol
-            p= misc.payment_method + ' : ' + quotation.payment_method
+            h4(class="text-center")= misc.to_pay + ' : ' + total + ' '  + quotation.currency_symbol
+            p(class="text-center")
+                em= misc.payment_method + ' : ' + quotation.payment_method
+
+        div
+            br
+            br
+
         div
             table
                 tr
-                    td= misc.vendor
-                    td= misc.customer
+                    td(class="text-center" style="width:50%;")
+                        strong= misc.vendor
+                    td(class="text-center" style="width:50%;")
+                        strong= misc.customer
                 tr
-                    td= vendor.title + ' ' + vendor.first_name + ' ' + vendor.last_name
-                    td= customer.title + ' ' + customer.first_name + ' ' + customer.last_name
+                    td(class="text-center" style="width:50%;")= vendor.title + ' ' + vendor.first_name + ' ' + vendor.last_name
+                    td(class="text-center" style="width:50%;")= customer.title + ' ' + customer.first_name + ' ' + customer.last_name
                 tr
-                    td
-                    td= misc.signature
+                    td(class="text-center" style="width:50%;")
+                    td(class="text-center" style="width:50%;")= misc.signature
+
+        footer
+            h6
+                em SNC Net Production Köbe & Co — Avenue de la Chablière 21 B, 1004 Lausanne, Suisse — CH-550.1.153.615-1
 
