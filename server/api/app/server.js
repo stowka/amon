@@ -9,6 +9,7 @@ var path = require('path');
 var logger = require('morgan');
 
 var routesQuotation = require('./routes/quotation');
+var routesAccess = require('./routes/access');
 
 var server = express();
 
@@ -17,6 +18,7 @@ server.set('view engine', 'jade');
 server.use(logger('dev'));
 
 server.use('/quotation', routesQuotation);
+server.use('/access', routesAccess);
 
 // catch 404 and forward to error handler
 server.use(function(req, res, next) {
@@ -29,7 +31,10 @@ server.use(function(req, res, next) {
 if (server.get('env') === 'development') {
     server.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.send('Error : ' + err.message);
+        res.json({
+            error : err.status,
+            message: err.message
+        });
     });
 }
 

@@ -18,29 +18,29 @@ DELIMITER $$
 CREATE PROCEDURE set_user_access(IN user_id INT)
 
 BEGIN
-	SELECT "set_user_access" AS log;
-	-- TODO add accesses to specified bundles for all users in groups
+    SELECT "set_user_access" AS log;
+    -- TODO add accesses to specified bundles for all users in groups
 END $$
 
 CREATE PROCEDURE set_project_access(IN project_id INT)
 
 BEGIN
-	SELECT "set_project_access" AS log;
-	-- TODO add full access to this project for all users in groups
+    SELECT "set_project_access" AS log;
+    -- TODO add full access to this project for all users in groups
 END $$
 
 CREATE PROCEDURE set_subproject_access(IN subproject_id INT)
 
 BEGIN
-	SELECT "set_subproject_access" AS log;
-	-- TODO add full access to this subproject for all users in groups
+    SELECT "set_subproject_access" AS log;
+    -- TODO add full access to this subproject for all users in groups
 END $$
 
 CREATE PROCEDURE set_collaborator(IN user_id INT, IN subproject_id INT)
 
 BEGIN
-	SELECT "set_collaborator" AS log;
-	-- TODO add full access to this subproject for this user
+    SELECT "set_collaborator" AS log;
+    -- TODO add full access to this subproject for this user
 END $$
 
 DELIMITER ;
@@ -51,10 +51,10 @@ DELIMITER ;
 -- hashtags
 --
 CREATE TABLE tag (
-	`id`  INT AUTO_INCREMENT,
-	`tag` VARCHAR(15) NOT NULL,
-	PRIMARY KEY (`id`),
-	UNIQUE KEY (`tag`)
+    `id`  INT AUTO_INCREMENT,
+    `tag` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY (`tag`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET="utf8";
 --
 -- hashtags
@@ -89,39 +89,39 @@ CREATE TABLE title_translation (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE contact (
-	`id`         INT AUTO_INCREMENT,
+    `id`         INT AUTO_INCREMENT,
     `title`      INT NOT NULL,
-	`first_name` VARCHAR(31) NOT NULL,
-	`last_name`  VARCHAR(31) NOT NULL,
-	`email`      VARCHAR(31) NOT NULL,
-	`address`    VARCHAR(255) DEFAULT "",
-	PRIMARY KEY (`id`),
+    `first_name` VARCHAR(31) NOT NULL,
+    `last_name`  VARCHAR(31) NOT NULL,
+    `email`      VARCHAR(31) NOT NULL,
+    `address`    VARCHAR(255) DEFAULT "",
+    PRIMARY KEY (`id`),
     CONSTRAINT `fk_contact_title`
         FOREIGN KEY (`title`)
         REFERENCES title(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE phone (
-	`id`           INT AUTO_INCREMENT,
-	`country_code` VARCHAR(3) NOT NULL,
-	`number`       VARCHAR(15) NOT NULL,
-	PRIMARY KEY (`id`)
+    `id`           INT AUTO_INCREMENT,
+    `country_code` VARCHAR(3) NOT NULL,
+    `number`       VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE contact_phone (
-	`contact` INT NOT NULL,
-	`phone`   INT NOT NULL,
-	PRIMARY KEY (`contact`, `phone`),
-	CONSTRAINT `fk_contact_phone_contact`
-		FOREIGN KEY (`contact`)
-		REFERENCES contact(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_contact_phone_phone`
-		FOREIGN KEY (`phone`)
-		REFERENCES phone(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `contact` INT NOT NULL,
+    `phone`   INT NOT NULL,
+    PRIMARY KEY (`contact`, `phone`),
+    CONSTRAINT `fk_contact_phone_contact`
+        FOREIGN KEY (`contact`)
+        REFERENCES contact(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_contact_phone_phone`
+        FOREIGN KEY (`phone`)
+        REFERENCES phone(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
 CREATE TABLE company (
@@ -145,19 +145,19 @@ CREATE TABLE works_for (
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
 CREATE TABLE company_phone (
-	`company` INT NOT NULL,
-	`phone`   INT NOT NULL,
-	PRIMARY KEY (`company`, `phone`),
-	CONSTRAINT `fk_company_phone_company`
-		FOREIGN KEY (`company`)
-		REFERENCES contact(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_company_phone_phone`
-		FOREIGN KEY (`phone`)
-		REFERENCES phone(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `company` INT NOT NULL,
+    `phone`   INT NOT NULL,
+    PRIMARY KEY (`company`, `phone`),
+    CONSTRAINT `fk_company_phone_company`
+        FOREIGN KEY (`company`)
+        REFERENCES contact(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_company_phone_phone`
+        FOREIGN KEY (`phone`)
+        REFERENCES phone(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
 
@@ -169,9 +169,9 @@ CREATE TABLE company_phone (
 -- internal access
 --
 CREATE TABLE team (
-	`id`   INT AUTO_INCREMENT,
-	`name` VARCHAR(15) NOT NULL,
-	PRIMARY KEY (`id`)
+    `id`   INT AUTO_INCREMENT,
+    `name` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 LOCK TABLES team WRITE;
@@ -181,75 +181,75 @@ VALUES ("Administrators"), ("Developers"), ("Designers"),
 UNLOCK TABLES;
 
 CREATE TABLE user (
-	`id`            INT AUTO_INCREMENT,
-	`username`      VARCHAR(8) NOT NULL,
-	`password_hash` VARCHAR(40) NOT NULL COMMENT "SHA-1",
-	`contact`       INT NOT NULL,
-	`start_date`    DATE NOT NULL,
-	`end_date`      DATE NOT NULL COMMENT "9999-12-31 = unlimited",
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_user_contact`
-		FOREIGN KEY (`contact`)
-		REFERENCES contact(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `id`            INT AUTO_INCREMENT,
+    `username`      VARCHAR(8) NOT NULL,
+    `password_hash` VARCHAR(40) NOT NULL COMMENT "SHA-1",
+    `contact`       INT NOT NULL,
+    `start_date`    DATE NOT NULL,
+    `end_date`      DATE NOT NULL COMMENT "9999-12-31 = unlimited",
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_user_contact`
+        FOREIGN KEY (`contact`)
+        REFERENCES contact(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE session (
-	`id`			INT AUTO_INCREMENT,
-	`user`			INT NOT NULL,
-	`ip`			VARCHAR(15) NOT NULL,
-	`token_hash`	VARCHAR(40) NOT NULL COMMENT "0x",
-	`login_dt`		DATETIME DEFAULT NOW(),
-	`user_agent`	VARCHAR(1023),
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_session_user`
-		FOREIGN KEY (`user`)
-		REFERENCES user(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `id`            INT AUTO_INCREMENT,
+    `user`          INT NOT NULL,
+    `ip`            VARCHAR(15) NOT NULL,
+    `token_hash`    VARCHAR(40) NOT NULL COMMENT "0x",
+    `login_dt`      DATETIME DEFAULT NOW(),
+    `user_agent`    VARCHAR(1023),
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_session_user`
+        FOREIGN KEY (`user`)
+        REFERENCES user(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE membership (
-	`user` INT NOT NULL,
-	`team` INT NOT NULL,
-	PRIMARY KEY (`user`, `team`),
-	CONSTRAINT `fk_membership_user`
-		FOREIGN KEY (`user`)
-		REFERENCES user(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_membership_team`
-		FOREIGN KEY (`team`)
-		REFERENCES team(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `user` INT NOT NULL,
+    `team` INT NOT NULL,
+    PRIMARY KEY (`user`, `team`),
+    CONSTRAINT `fk_membership_user`
+        FOREIGN KEY (`user`)
+        REFERENCES user(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_membership_team`
+        FOREIGN KEY (`team`)
+        REFERENCES team(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
 CREATE TABLE bundle (
-	`id`        INT AUTO_INCREMENT,
-	`key`       VARCHAR(15) NOT NULL,
+    `id`        INT AUTO_INCREMENT,
+    `key`       VARCHAR(15) NOT NULL,
     `name`      VARCHAR(31) NOT NULL,
     `activated` BOOLEAN DEFAULT FALSE,
-	PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE user_access (
-	`user`       INT NOT NULL,
-	`bundle`     INT NOT NULL,
+    `user`       INT NOT NULL,
+    `bundle`     INT NOT NULL,
     `mode`       VARCHAR(4) DEFAULT "f" COMMENT "f=forbidden,
-    r=read, w=write",
-	PRIMARY KEY (`user`, `bundle`),
-	CONSTRAINT `fk_user_access_user`
-		FOREIGN KEY (`user`)
-		REFERENCES user(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_user_access_bundle`
-		FOREIGN KEY (`bundle`)
-		REFERENCES bundle(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    c=create, r=read, u=update, d=delete",
+    PRIMARY KEY (`user`, `bundle`),
+    CONSTRAINT `fk_user_access_user`
+        FOREIGN KEY (`user`)
+        REFERENCES user(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_user_access_bundle`
+        FOREIGN KEY (`bundle`)
+        REFERENCES bundle(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 -- Triggers
@@ -258,8 +258,8 @@ CREATE TRIGGER set_access AFTER INSERT
 ON user FOR EACH ROW
 
 BEGIN
-	SET @user_id := NEW.id;
-	CALL set_user_access(@user_id);
+    SET @user_id := NEW.id;
+    CALL set_user_access(@user_id);
 END $$
 
 DELIMITER ;*/
@@ -273,79 +273,79 @@ DELIMITER ;*/
 -- projects
 --
 CREATE TABLE project (
-	`id`                INT AUTO_INCREMENT,
-	`name`              VARCHAR(31) NOT NULL,
-	`short_description` VARCHAR(63) DEFAULT "",
-	`long_description`  VARCHAR(2047) DEFAULT "",
-	PRIMARY KEY (`id`)
+    `id`                INT AUTO_INCREMENT,
+    `name`              VARCHAR(31) NOT NULL,
+    `short_description` VARCHAR(63) DEFAULT "",
+    `long_description`  VARCHAR(2047) DEFAULT "",
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE subproject (
-	`id`          INT AUTO_INCREMENT,
-	`project`     INT NOT NULL,
-	`name`        VARCHAR(31) NOT NULL,
-	`github_repo` VARCHAR(63) DEFAULT "",
-	`tag`         INT NOT NULL,
-	PRIMARY KEY (`id`),
-	UNIQUE KEY (`tag`),
-	CONSTRAINT `fk_subproject_project`
-		FOREIGN KEY (`project`)
-		REFERENCES project(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_subproject_tag`
-		FOREIGN KEY (`tag`)
-		REFERENCES tag(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `id`          INT AUTO_INCREMENT,
+    `project`     INT NOT NULL,
+    `name`        VARCHAR(31) NOT NULL,
+    `github_repo` VARCHAR(63) DEFAULT "",
+    `tag`         INT NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY (`tag`),
+    CONSTRAINT `fk_subproject_project`
+        FOREIGN KEY (`project`)
+        REFERENCES project(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_subproject_tag`
+        FOREIGN KEY (`tag`)
+        REFERENCES tag(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE collaborator (
-	`user`       INT NOT NULL,
-	`subproject` INT NOT NULL,
-	PRIMARY KEY (`user`, `subproject`),
-	CONSTRAINT `fk_collaborator_user`
-		FOREIGN KEY (`user`)
-		REFERENCES user(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_collaborator_subproject`
-		FOREIGN KEY (`subproject`)
-		REFERENCES subproject(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `user`       INT NOT NULL,
+    `subproject` INT NOT NULL,
+    PRIMARY KEY (`user`, `subproject`),
+    CONSTRAINT `fk_collaborator_user`
+        FOREIGN KEY (`user`)
+        REFERENCES user(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_collaborator_subproject`
+        FOREIGN KEY (`subproject`)
+        REFERENCES subproject(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
 CREATE TABLE project_access (
-	`project` INT NOT NULL,
-	`user`    INT NOT NULL,
-	`access`  ENUM("f", "r", "w", "rw"),
-	CONSTRAINT `fk_project_access_project`
-		FOREIGN KEY (`project`)
-		REFERENCES project(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_project_access_user`
-		FOREIGN KEY (`user`)
-		REFERENCES user(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `project` INT NOT NULL,
+    `user`    INT NOT NULL,
+    `access`  ENUM("f", "r", "w", "rw"),
+    CONSTRAINT `fk_project_access_project`
+        FOREIGN KEY (`project`)
+        REFERENCES project(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_project_access_user`
+        FOREIGN KEY (`user`)
+        REFERENCES user(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
 CREATE TABLE subproject_access (
-	`subproject` INT NOT NULL,
-	`user`       INT NOT NULL,
-	`access`     ENUM("f", "r", "w", "rw"),
-	CONSTRAINT `fk_subproject_access_subproject`
-		FOREIGN KEY (`subproject`)
-		REFERENCES subproject(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_subproject_access_user`
-		FOREIGN KEY (`user`)
-		REFERENCES user(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `subproject` INT NOT NULL,
+    `user`       INT NOT NULL,
+    `access`     ENUM("f", "r", "w", "rw"),
+    CONSTRAINT `fk_subproject_access_subproject`
+        FOREIGN KEY (`subproject`)
+        REFERENCES subproject(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_subproject_access_user`
+        FOREIGN KEY (`user`)
+        REFERENCES user(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 --
 -- projects
@@ -355,26 +355,26 @@ CREATE TABLE subproject_access (
 -- task manager
 --
 CREATE TABLE task (
-	`id`            INT AUTO_INCREMENT,
-	`text`          VARCHAR(255) NOT NULL,
-	`done`          BOOLEAN DEFAULT 0,
-	`priority`      ENUM("low", "normal", "high"),
-	`creation_dt`   DATETIME DEFAULT NOW(),
-	`critical_date` DATE COMMENT "when the priority increases to high",
-	`end_date`      DATE NOT NULL COMMENT "when the task has to be done",
-	`from`          INT NOT NULL COMMENT "user",
-	`to`            INT NOT NULL COMMENT "user",
-	PRIMARY KEY (`id`),
-	CONSTRAINT `fk_task_from`
-		FOREIGN KEY (`from`)
-		REFERENCES user(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE,
-	CONSTRAINT `fk_task_to`
-		FOREIGN KEY (`to`)
-		REFERENCES user(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+    `id`            INT AUTO_INCREMENT,
+    `text`          VARCHAR(255) NOT NULL,
+    `done`          BOOLEAN DEFAULT 0,
+    `priority`      ENUM("low", "normal", "high"),
+    `creation_dt`   DATETIME DEFAULT NOW(),
+    `critical_date` DATE COMMENT "when the priority increases to high",
+    `end_date`      DATE NOT NULL COMMENT "when the task has to be done",
+    `from`          INT NOT NULL COMMENT "user",
+    `to`            INT NOT NULL COMMENT "user",
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_task_from`
+        FOREIGN KEY (`from`)
+        REFERENCES user(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_task_to`
+        FOREIGN KEY (`to`)
+        REFERENCES user(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 --
 -- task manager

@@ -1,0 +1,17 @@
+{
+  "name": "access",
+  "version": "1.0.0",
+  "description": "",
+  "main": "access.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "access"
+  ],
+  "author": "Antoine De Gieter",
+  "license": "ISC",
+  "dependencies": {
+    "string": "^3.1.1"
+  }
+}
