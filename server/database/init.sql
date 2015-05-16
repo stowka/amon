@@ -4,9 +4,9 @@
 -- @copyright Net Production Köbe & Co
 --
 
-DROP DATABASE IF EXISTS `AMON`;
-CREATE DATABASE `AMON` CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `AMON`;
+DROP DATABASE IF EXISTS `Amon`;
+CREATE DATABASE `Amon` CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `Amon`;
 
 SET autocommit = 0;
 
@@ -184,7 +184,6 @@ CREATE TABLE user (
 	`id`            INT AUTO_INCREMENT,
 	`username`      VARCHAR(8) NOT NULL,
 	`password_hash` VARCHAR(40) NOT NULL COMMENT "SHA-1",
-	`token_hash`    VARCHAR(40) NOT NULL COMMENT "SHA-1",
 	`contact`       INT NOT NULL,
 	`start_date`    DATE NOT NULL,
 	`end_date`      DATE NOT NULL COMMENT "9999-12-31 = unlimited",
@@ -192,6 +191,21 @@ CREATE TABLE user (
 	CONSTRAINT `fk_user_contact`
 		FOREIGN KEY (`contact`)
 		REFERENCES contact(`id`)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
+
+CREATE TABLE session (
+	`id`			INT AUTO_INCREMENT,
+	`user`			INT NOT NULL,
+	`ip`			VARCHAR(15) NOT NULL,
+	`token_hash`	VARCHAR(40) NOT NULL COMMENT "0x",
+	`login_dt`		DATETIME DEFAULT NOW(),
+	`user_agent`	VARCHAR(1023),
+	PRIMARY KEY (`id`),
+	CONSTRAINT `fk_session_user`
+		FOREIGN KEY (`user`)
+		REFERENCES user(`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
@@ -215,18 +229,17 @@ CREATE TABLE membership (
 CREATE TABLE bundle (
 	`id`        INT AUTO_INCREMENT,
 	`key`       VARCHAR(15) NOT NULL,
-    `name`      VARCHAR(50) NOT NULL,
+    `name`      VARCHAR(31) NOT NULL,
     `activated` BOOLEAN DEFAULT FALSE,
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE user_access (
-	`id`         INT AUTO_INCREMENT,
 	`user`       INT NOT NULL,
 	`bundle`     INT NOT NULL,
-    `mode`       ENUM("f", "r", "w", "rw") DEFAULT "r" COMMENT "f=forbidden,
+    `mode`       VARCHAR(4) DEFAULT "f" COMMENT "f=forbidden,
     r=read, w=write",
-	PRIMARY KEY (`id`),
+	PRIMARY KEY (`user`, `bundle`),
 	CONSTRAINT `fk_user_access_user`
 		FOREIGN KEY (`user`)
 		REFERENCES user(`id`)
