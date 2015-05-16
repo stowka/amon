@@ -474,6 +474,8 @@ CREATE TABLE detail (
     CONSTRAINT `fk_detail_quotation`
         FOREIGN KEY (`quotation`)
         REFERENCES quotation(`id`)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 

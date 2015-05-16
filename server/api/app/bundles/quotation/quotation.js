@@ -1,71 +1,89 @@
 //Public functions
+
+var database = require("../database/database.js");
+
 module.exports = {
     
     generatePdf: function (idQuotation, callback) {
-        var connection = connectToDatabase();
 
-        var id = connection.escape(idQuotation);
-        var lang = connection.escape('fr-CH');
+        var sqlQuotation = {
+            query: "SELECT Q.id, Q.summary, PMT.label as payment_method, "
+                + "C.symbol as currency_symbol, CT.name as currency, "
+                + "Q.date_of_creation, Q.date_of_validity, Q.language "
+                + "FROM quotation Q, payment_method PM, "
+                + "payment_method_translation PMT, currency C, "
+                + "currency_translation CT WHERE Q.id = :id "
+                + "AND Q.payment_method = PM.id " 
+                + "AND PMT.payment_method = PM.id " 
+                + "AND PMT.language = Q.language " 
+                + "AND Q.currency = C.id " 
+                + "AND CT.currency = C.id " 
+                + "AND CT.language = Q.language;",
+            data: {
+                id: idQuotation
+            }
+        };
 
-        var sqlQuotation = 
-            'SELECT Q.id, Q.summary, PMT.label as payment_method, C.symbol as currency_symbol, ' + 
-                'CT.name as currency, Q.date_of_creation, Q.date_of_validity, Q.language ' + 
-            'FROM quotation Q, payment_method PM, payment_method_translation PMT, currency C, ' +
-                'currency_translation CT ' +
-            'WHERE Q.id = ' + id + ' ' +
-            'AND   Q.payment_method = PM.id ' +
-            'AND   PMT.payment_method = PM.id ' +
-            'AND   PMT.language = Q.language ' + 
-            'AND   Q.currency = C.id ' + 
-            'AND   CT.currency = C.id ' +
-            'AND   CT.language = Q.language;';
+        var sqlCustomer = {
+            query: "SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, " +
+                "P.country_code, P.number " +
+            "FROM quotation Q, contact C, title T, title_translation TT, phone P, " +
+                "contact_phone CP " +
+            "WHERE Q.id = :id " +
+            "AND Q.customer = C.id " +
+            "AND C.title = T.id " +
+            "AND TT.title = T.id " +
+            "AND TT.language = Q.language " + 
+            "AND CP.contact = C.id " + 
+            "AND CP.phone = P.id LIMIT 1; ",
+            data: {
+                id: idQuotation
+            }
+        };
 
-        var sqlCustomer = 
-            'SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, ' +
-                'P.country_code, P.number ' +
-            'FROM quotation Q, contact C, title T, title_translation TT, phone P, ' +
-                'contact_phone CP ' +
-            'WHERE Q.id = ' + id + ' ' +
-            'AND   Q.customer = C.id ' +
-            'AND   C.title = T.id ' +
-            'AND   TT.title = T.id ' +
-            'AND   TT.language = Q.language ' + 
-            'AND   CP.contact = C.id ' + 
-            'AND   CP.phone = P.id LIMIT 1; ';
-
-        var sqlVendor = 
-            'SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, ' +
+        var sqlVendor = {
+            query: 'SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, ' +
                 'P.country_code, P.number ' +
             'FROM quotation Q, contact C, title T, title_translation TT, phone P,  ' +
                 'contact_phone CP ' +
-            'WHERE Q.id = ' + id + ' ' +
+            'WHERE Q.id = :id ' +
             'AND   Q.vendor = C.id ' +
             'AND   C.title = T.id ' +
             'AND   TT.title = T.id ' + 
             'AND   TT.language = Q.language ' +
             'AND   CP.contact = C.id ' +
-            'AND   CP.phone = P.id LIMIT 1; ';
+            'AND   CP.phone = P.id LIMIT 1; ',
+            data: {
+                id: idQuotation
+            }
+        };
 
-        var sqlDetail = 
-            'SELECT D.line, D.description, D.discount, D.quantity, D.price, ' +
+        var sqlDetail = {
+            query: 'SELECT D.line, D.description, D.discount, D.quantity, D.price, ' +
                 '(D.price * D.quantity * (1 - D.discount/100)) as total_ht ' +
             'FROM quotation Q, detail D  ' +
             'WHERE D.quotation = Q.id ' + 
-            'ORDER BY D.line;';
+            'ORDER BY D.line;'
+        };
 
-        var sqlMisc = 
-            'SELECT M.keyword, M.text ' + 
+        var sqlMisc = {
+            query: 'SELECT M.keyword, M.text ' + 
             'FROM misc M, quotation Q ' + 
-            'WHERE Q.id = ' + id + ' ' +
-            'AND   M.language = Q.language;';
+            'WHERE Q.id = :id ' +
+            'AND   M.language = Q.language;',
+            data: {
+                id: idQuotation
+            }
+        };
 
-        var sqlQuery = sqlQuotation + sqlVendor + sqlCustomer + sqlDetail + sqlMisc;
+        var sqlQuery = sqlQuotation.query + sqlVendor.query + sqlCustomer.query 
+            + sqlDetail.query + sqlMisc.query;
 
-        connection.query(sqlQuery, function(err, results, fields) {
-            //Mysql error
-            if(err) {
-                callback(false, err);
-            } 
+        database.execute(sqlQuery, {
+            id: idQuotation
+        },
+        function(results) {
+            console.log(results); // /!\ UNDEFINED 
 
             //If the quotation exists in the database
             if(results[0].length > 0) {
@@ -103,18 +121,13 @@ module.exports = {
                     };
                     callback(true, data);
                 });
-            //If there is no quotation
             } else {
-                callback(false, "No quotation found for this Id");
+                callback(false, "No quotation found for this id");
             }
         });
-        
-        connection.end();
     },
 
     readAll: function(callback) {
-        var connection = connectToDatabase();
-
         var sql = 'SELECT Q.id, Q.summary, Q.date_of_creation, ' +
                   '       V.first_name as vendor_first_name, ' +
                   '       V.last_name as vendor_last_name, ' +
@@ -124,41 +137,23 @@ module.exports = {
                   'WHERE Q.vendor = V.id ' +
                   'AND   Q.customer = C.id;';
 
-        connection.query(sql, function(err, results, fields) {
-            if (err) {
+        database.execute(sql, {}, function(results) {
+            if (!results.length) {
                 callback(false, err);
             } else {
-                callback(true, {quotation : results});
+                callback(true, {quotation: results});
             }
         });
-
-        connection.end();
     },
 
     remove: function(idQuotation, callback) {
-        var connection = connectToDatabase();
-        
-        var sql = 'START TRANSACTION; ' +
-                  'DELETE D ' + 
-                  'FROM detail D, quotation_detail QD ' +
-                  'WHERE QD.quotation = ? ' + 
-                  'AND   QD.detail = D.id; ' + 
-                  'DELETE ' + 
-                  'FROM quotation ' +
-                  'WHERE id = ?; ' +
-                  'COMMIT;';
+        var sql = "DELETE FROM quotation WHERE id = :id;";
 
-
-        connection.query(sql, [idQuotation, idQuotation], function(err, results) {
-            if (err) {
-                callback(false, err);
-            } else {
-                data = results[1].affectedRows + results[2].affectedRows;
-                callback(true, data);
-            }
+        database.execute(sql, {
+            id: idQuotation
+        }, function(results) {
+            callback(true, results);
         });
-        
-        connection.end();
     },
 
     storeQuotation: function(quotation, callback) {
@@ -173,39 +168,26 @@ module.exports = {
     },
 };
 
-
-//private functions
-
-function connectToDatabase() {
-    var mysql = require('mysql');
-    var connection = mysql.createConnection({
-        host : 'localhost',
-        user : 'root',
-        database : 'AMON',
-        multipleStatements : true
-    });
-    connection.connect();
-    return connection;
-}
-
 function store(quotation, callback) {
     quotation.today = new Date();
     quotation.validity = new Date();
     quotation.validity.setDate(quotation.validity.getDate() + 30);
 
-    var connection = connectToDatabase();
-
-    connection.query("INSERT INTO quotation VALUES (null, ?,?,?,?,?,?,?);",
-    [quotation.summary, quotation.vendor, quotation.customer, quotation.payment_method,
-     quotation.currency, quotation.today, quotation.validity],
-    function(err, results, fields) {
-        if (err) {
-            callback(false, err);
-        } else {
-            callback(true, null);
-        }
-    });
-    connection.end();
+    database.execute("INSERT INTO quotation VALUES (null, :summary, :vendor, "
+        + ":customer, :payment_method, :currency, :today, :validity", {
+            summary: quotation.summary, 
+            vendor: quotation.vendor, 
+            customer: quotation.customer, 
+            payment_method: quotation.payment_method,
+            currency: quotation.currency, 
+            today: quotation.today, 
+            validity: quotation.validity
+        }, function(results) {
+            if (result.insertId)
+                callback(result.insertId);
+            else
+                callback(false);
+        });
 }
 
 function computeTotal(tasks) {

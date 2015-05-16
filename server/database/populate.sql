@@ -132,7 +132,7 @@ INSERT INTO user VALUES (NULL, "kobenath", sha1("password"), 2,
 ----------------- membership ------------------------------------------------
 INSERT INTO membership VALUES (1, 1), (1, 2), 
 (2, 1), (2, 5), 
-(3, 1) (3, 4),
+(3, 1), (3, 4),
 (4, 2);
 
 --

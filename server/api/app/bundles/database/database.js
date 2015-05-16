@@ -61,7 +61,8 @@ function connect(credentials) {
 				host		: credentials.host,
 				user		: credentials.user,
 				password	: credentials.password,
-				database	: credentials.database
+				database	: credentials.database,
+        		multipleStatements : true
 			});
 			c.config.queryFormat = function (query, values) {
 				if (!values) 
