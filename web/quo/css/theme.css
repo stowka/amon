@@ -1,0 +1,118 @@
+body {
+    margin-top: 60px;
+}
+
+#body-background {
+    z-index: -1;
+    position: fixed;
+    left: -48px;
+    right: -48px;
+    top: -48px;
+    bottom: -48px;
+    background-image: url(../img/backgrounds/fog.jpg);
+    background-size: cover;
+    -webkit-filter: blur(24px);
+    -moz-filter: blur(24px);
+    -o-filter: blur(24px);
+    -ms-filter: blur(24px);
+    filter: blur(24px);
+}
+
+#body-contents {
+    text-align: center;
+    font-family: 'Lato-Light';
+}
+
+.welcome-message {
+    color: #fff;
+}
+
+.app-logo {
+    border-radius: 92px;
+}
+
+.login-box {
+    text-shadow: 0 0 24px #000;
+    margin: 92px;
+    padding: 92px;
+    /*background-color: rgba(0, 0, 0, 0.8);*/
+    border-radius: 12px;
+}
+
+.bundle-box {
+    position: relative;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 6px;
+    margin-top: 6px;
+    -webkit-transition: all .25s;
+       -moz-transition: all .25s;
+        -ms-transition: all .25s;
+         -o-transition: all .25s;
+            transition: all .25s;
+}
+
+.row.bundles div {
+    text-align: center;
+    text-shadow: none;
+}
+
+.bundle-box:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+}
+
+@media (min-width:992px) {
+    .bundle-box {
+        width: 120px;
+        height: 120px;
+        line-height: 120px;
+        border-radius: 24px;
+    }
+}
+
+@media (max-width:991px) {
+    .bundle-box {
+        width: 90px;
+        height: 90px;
+        line-height: 90px;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width:767px) {
+    .bundle-box {
+        width: 60px;
+        height: 60px;
+        line-height: 60px;
+        border-radius: 16px;
+    }
+}
+
+#bundle-quotations {
+    background-color: #f5f5f5;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 80px;
+}
+
+#quotations-contents {
+    overflow-y: scroll;
+}
+
+.quotation {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #eee;
+    box-shadow: 0 0 1px #888;
+    margin-bottom: 10px;
+}
+
+.loader-gif {
+    margin: 8px;
+    width: 32px
+    height: 32px;
+}
