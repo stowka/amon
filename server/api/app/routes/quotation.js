@@ -7,15 +7,23 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({extended: false}));
 
 router.get('/pdf/:id', function(req, res, next) {
-    var filename = 'quotation_' + req.params.id + '.pdf';
-
-    fs.readFile(filename, function(err, file) {
-        if (err) {
-            res.status(404);
-            res.json({errorCode : 1, error : "The file doesn't exist"});
+    var id = req.params.id;
+    
+    quotation.generatePdf(id, function(success, data) {
+        if(success) {
+            var filename = 'quotation_' + req.params.id + '.pdf';
+            fs.readFile(filename, function(err, file) {
+                if (err) {
+                    res.status(200);
+                    res.json({error : 1, message : "No such file! (" + file + ")"});
+                } else {
+                    res.writeHeader(200, {'contentType': 'application/pdf'});
+                    res.end(file);
+                }
+            });
         } else {
-            res.writeHeader(200, {'contentType': 'application/pdf'});
-            res.end(file);
+            res.status(200);
+            res.json({error : 1, message : "Couldn't generate PDF!"});
         }
     });
 });
@@ -34,8 +42,7 @@ router.get('/read/all', function(req, res, next) {
 
 router.get('/read/:id', function(req, res, next) {
     var id = req.params.id;
-
-    quotation.generatePdf(id, function(success, data) {
+    quotation.read(id, function(success, data) {
         if(success) {
             res.status(200);
             res.json(data);

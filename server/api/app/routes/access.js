@@ -15,10 +15,13 @@ router.post('/login', function(req, res) {
         if (success) {
             res.status(200);
             res.json({
-                token: token.id + ":" + token.hash
+                token: token.user.id + ":" + token.hash,
+                contact: token.user.contact,
+                start_date: token.user.start_date,
+                end_date: token.user.end_date
             });
         } else {
-            res.status(400);
+            res.status(200);
             res.json({
                 error: 1,
                 message: "Wrong username or password."
@@ -35,7 +38,7 @@ router.post('/logout', function(req, res) {
         if (success) {
             res.sendStatus(200);
         } else {
-            res.status(400);
+            res.status(200);
             res.json({
                 error: 1,
                 message: "No such a session."

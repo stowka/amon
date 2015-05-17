@@ -14,7 +14,8 @@ module.exports = {
     // TODO check if such a session already exists with ip and user_agent 
     // in order to only update the matching row.
     login: function(username, password_hash, ip, user_agent, callback) {
-        database.execute("SELECT id FROM user WHERE username = :username AND "
+        database.execute("SELECT id, contact, start_date, end_date FROM user "
+            + "WHERE username = :username AND "
             + "password_hash = :password_hash", {
                 username: username,
                 password_hash: password_hash
@@ -32,7 +33,12 @@ module.exports = {
                         user_agent: user_agent
                     }, function() {
                         callback(true, {
-                            id: result[0].id,
+                            user: {
+                                id: result[0].id,
+                                contact: result[0].contact,
+                                start_date: result[0].start_date,
+                                end_date: result[0].end_date,
+                            },
                             hash: hash
                         })
                     });

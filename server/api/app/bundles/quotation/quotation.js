@@ -3,6 +3,110 @@
 var database = require("../database/database.js");
 
 module.exports = {
+
+    read: function(idQuotation, callback) {
+        var sqlQuotation = {
+            query: "SELECT Q.id, Q.summary, PMT.label as payment_method, "
+                + "C.symbol as currency_symbol, CT.name as currency, "
+                + "Q.date_of_creation, Q.date_of_validity, Q.language "
+                + "FROM quotation Q, payment_method PM, "
+                + "payment_method_translation PMT, currency C, "
+                + "currency_translation CT WHERE Q.id = :id "
+                + "AND Q.payment_method = PM.id " 
+                + "AND PMT.payment_method = PM.id " 
+                + "AND PMT.language = Q.language " 
+                + "AND Q.currency = C.id " 
+                + "AND CT.currency = C.id " 
+                + "AND CT.language = Q.language;",
+            data: {
+                id: idQuotation
+            }
+        };
+
+        var sqlCustomer = {
+            query: "SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, " +
+                "P.country_code, P.number " +
+            "FROM quotation Q, contact C, title T, title_translation TT, phone P, " +
+                "contact_phone CP " +
+            "WHERE Q.id = :id " +
+            "AND Q.customer = C.id " +
+            "AND C.title = T.id " +
+            "AND TT.title = T.id " +
+            "AND TT.language = Q.language " + 
+            "AND CP.contact = C.id " + 
+            "AND CP.phone = P.id LIMIT 1; ",
+            data: {
+                id: idQuotation
+            }
+        };
+
+        var sqlVendor = {
+            query: 'SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, ' +
+                'P.country_code, P.number ' +
+            'FROM quotation Q, contact C, title T, title_translation TT, phone P,  ' +
+                'contact_phone CP ' +
+            'WHERE Q.id = :id ' +
+            'AND   Q.vendor = C.id ' +
+            'AND   C.title = T.id ' +
+            'AND   TT.title = T.id ' + 
+            'AND   TT.language = Q.language ' +
+            'AND   CP.contact = C.id ' +
+            'AND   CP.phone = P.id LIMIT 1; ',
+            data: {
+                id: idQuotation
+            }
+        };
+
+        var sqlDetail = {
+            query: 'SELECT D.line, D.description, D.discount, D.quantity, D.price, ' +
+                '(D.price * D.quantity * (1 - D.discount/100)) as total_ht ' +
+            'FROM quotation Q, detail D  ' +
+            'WHERE D.quotation = Q.id ' + 
+            'ORDER BY D.line;'
+        };
+
+        var sqlMisc = {
+            query: 'SELECT M.keyword, M.text ' + 
+            'FROM misc M, quotation Q ' + 
+            'WHERE Q.id = :id ' +
+            'AND   M.language = Q.language;',
+            data: {
+                id: idQuotation
+            }
+        };
+
+        var sqlQuery = sqlQuotation.query + sqlVendor.query + sqlCustomer.query 
+            + sqlDetail.query + sqlMisc.query;
+
+        database.execute(sqlQuery, {
+            id: idQuotation
+        },
+        function(results) {
+            //If the quotation exists in the database
+            if(results[0].length > 0) {
+
+                var total = computeTotal(results[3]);
+
+                //Date format
+                results[0][0].date_of_creation =
+                    formatDate(results[0][0].date_of_creation, results[0][0].language);
+                results[0][0].date_of_validity =
+                    formatDate(results[0][0].date_of_validity, results[0][0].language);
+
+                var data = {
+                    quotation   : results[0][0],
+                    vendor      : results[1][0],
+                    customer    : results[2][0],
+                    details     : results[3],
+                };
+
+                callback(true, data);
+            } else {
+                callback(false, "No quotation found for this id");
+            }
+        });
+
+    },
     
     generatePdf: function (idQuotation, callback) {
 
@@ -83,8 +187,6 @@ module.exports = {
             id: idQuotation
         },
         function(results) {
-            console.log(results); // /!\ UNDEFINED 
-
             //If the quotation exists in the database
             if(results[0].length > 0) {
 
