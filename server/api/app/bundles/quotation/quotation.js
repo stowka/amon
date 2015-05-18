@@ -248,6 +248,28 @@ module.exports = {
         });
     },
 
+    update: function(quotation, callback) {
+        var sql = 'UPDATE quotation SET summary = :summary, vendor = :vendor, ' + 
+            'customer = :customer, payment_method = :payment_method, ' +
+            'currency = :currency, language = :language WHERE id = :id;';
+
+        database.execute(sql, {
+            id             : quotation.id,
+            summary        : quotation.summary, 
+            vendor         : quotation.vendor, 
+            customer       : quotation.customer, 
+            payment_method : quotation.payment_method,
+            currency       : quotation.currency, 
+            language       : quotation.language
+        }, function(results) {
+            if(results.affectedRows === 1) {
+                callback(true, results);
+            } else {
+                callback(false, results);
+            }
+        });
+    },
+
     remove: function(idQuotation, callback) {
         var sql = "DELETE FROM quotation WHERE id = :id;";
 

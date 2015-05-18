@@ -40,6 +40,18 @@ router.get('/read/all', function(req, res, next) {
     });
 });
 
+router.post('/update', function(req, res, next) {
+    quotation.update(req.body, function(success, data) {
+        if(success) {
+            res.status(200);
+            res.json(data);
+        } else {
+            res.status(400);
+            res.json(data);
+        }
+    });
+});
+
 router.get('/read/:id', function(req, res, next) {
     var id = req.params.id;
     quotation.read(id, function(success, data) {
@@ -70,7 +82,7 @@ router.get('/delete/:id', function(req, res, next) {
 });
 
 
-router.post('/create', function(req, res) {
+router.post('/create', function(req, res, next) {
     quotation.storeQuotation(req.body, function(success, data) {
         if(success) {
             res.sendStatus(200);
@@ -81,7 +93,7 @@ router.post('/create', function(req, res) {
     });
 });
 
-router.post('/line/create', function(req, res) {
+router.post('/line/create', function(req, res, next) {
     quotation.storeLine(req.body, function(success, data) {
         if(success) {
             res.status(200);
@@ -93,7 +105,7 @@ router.post('/line/create', function(req, res) {
     });
 });
 
-router.get('/line/read/:id', function(req, res) {
+router.get('/line/read/:id', function(req, res, next) {
     quotation.readLine(req.params.id, function(success, data) {
         if(success) {
             res.status(200);
@@ -105,7 +117,7 @@ router.get('/line/read/:id', function(req, res) {
     });
 });
 
-router.post('/line/update', function(req, res) {
+router.post('/line/update', function(req, res, next) {
     quotation.updateLine(req.body, function(success, data) {
         if(success) {
             res.status(200);
@@ -117,7 +129,7 @@ router.post('/line/update', function(req, res) {
     });
 });
 
-router.get('/line/remove/:id', function(req, res) {
+router.get('/line/remove/:id', function(req, res, next) {
     quotation.removeLine(req.params.id, function(success, data) {
         if(success) {
             res.status(200);
