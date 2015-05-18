@@ -4,7 +4,7 @@ var router = express.Router();
 var quotation = require('../bundles/quotation/quotation');
 var bodyParser = require('body-parser');
 
-router.use(bodyParser.urlencoded({extended: false}));
+router.use(bodyParser.json());
 
 router.get('/pdf/:id', function(req, res, next) {
     var id = req.params.id;
@@ -47,7 +47,7 @@ router.get('/read/:id', function(req, res, next) {
             res.status(200);
             res.json(data);
         } else {
-            res.status = 404;
+            res.status(404);
             res.json(data);
         }
     });
@@ -71,22 +71,63 @@ router.get('/delete/:id', function(req, res, next) {
 
 
 router.post('/create', function(req, res) {
-    var quotationData = {
-        summary        : req.body.summary,
-        vendor         : req.body.vendor,
-        customer       : req.body.customer,
-        payment_method : req.body.payment_method,
-        currency       : req.body.currency
-    };
-
-    quotation.storeQuotation(quotationData, function(success, err) {
+    quotation.storeQuotation(req.body, function(success, data) {
         if(success) {
             res.sendStatus(200);
         } else {
             res.status(400);
-            res.json(err);
+            res.json(data);
         }
     });
 });
+
+router.post('/line/create', function(req, res) {
+    quotation.storeLine(req.body, function(success, data) {
+        if(success) {
+            res.status(200);
+            res.json(data);
+        } else {
+            res.status(400);
+            res.json(data);
+        }
+    });
+});
+
+router.get('/line/read/:id', function(req, res) {
+    quotation.readLine(req.params.id, function(success, data) {
+        if(success) {
+            res.status(200);
+            res.json(data);
+        } else {
+            res.status(400);
+            res.json(data);
+        }
+    });
+});
+
+router.post('/line/update', function(req, res) {
+    quotation.updateLine(req.body, function(success, data) {
+        if(success) {
+            res.status(200);
+            res.json(data);
+        } else {
+            res.status(400);
+            res.json(data);
+        }
+    });
+});
+
+router.get('/line/remove/:id', function(req, res) {
+    quotation.removeLine(req.params.id, function(success, data) {
+        if(success) {
+            res.status(200);
+            res.json(data);
+        } else {
+            res.status(400);
+            res.json(data);
+        }
+    });
+});
+
 
 module.exports = router;

@@ -268,6 +268,76 @@ module.exports = {
          */
         store(quotation, callback);
     },
+
+    storeLine: function(line, callback) {
+        var sql = 'INSERT INTO detail VALUES (null, :description, ' + 
+                ':discount, :quantity, :price, :line, :quotation);';
+
+        database.execute(sql, {
+            description : line.description,
+            discount    : line.discount,
+            quantity    : line.quantity,
+            price       : line.price,
+            line        : line.line,
+            quotation   : line.quotation
+        }, function(results) {
+            if(results.affectedRows === 1) {
+                callback(true);
+            } else {
+                callback(false, results);
+            }
+        });
+    },
+
+    removeLine: function(idLine, callback) {
+        var sql = 'DELETE FROM detail WHERE id = :id;';
+
+        database.execute(sql, {
+            id : idLine
+        }, function(results) {
+            if(results.affectedRows === 1) {
+                callback(true, results);
+            } else {
+                callback(false, results);
+            }
+        });
+    },
+
+    updateLine: function(line, callback) {
+        var sql = 'UPDATE detail SET description = :description, discount = :discount, '+
+            'quantity = :quantity, price = :price, line = :line, quotation = :quotation '+
+            'WHERE id = : id;';
+
+        database.execute(sql, {
+            id          : line.id,
+            description : line.description,
+            discount    : line.discount,
+            quantity    : line.quantity,
+            price       : line.price,
+            line        : line.line,
+            quotation   : line.quotation
+        }, function(results) {
+            if(results.affectedRows === 1) {
+                callback(true, data);
+            } else {
+                callback(false, data);
+            }
+        });
+    },
+
+    readLine: function(idLine, callback) {
+        var sql = 'SELECT * FROM detail WHERE id = :id;';
+
+        database.execute(sql, {
+            id : idLine
+        }, function(results) {
+            if(results.length === 1) {
+                callback(true, results[0]);
+            } else {
+                callback(false, results);
+            }
+        });
+    }
 };
 
 function store(quotation, callback) {
@@ -275,21 +345,23 @@ function store(quotation, callback) {
     quotation.validity = new Date();
     quotation.validity.setDate(quotation.validity.getDate() + 30);
 
-    database.execute("INSERT INTO quotation VALUES (null, :summary, :vendor, "
-        + ":customer, :payment_method, :currency, :today, :validity", {
+    database.execute('INSERT INTO quotation VALUES (null, :summary, :vendor, '
+        + ':customer, :payment_method, :currency, :today, :validity, :language);', {
             summary: quotation.summary, 
             vendor: quotation.vendor, 
             customer: quotation.customer, 
             payment_method: quotation.payment_method,
             currency: quotation.currency, 
             today: quotation.today, 
-            validity: quotation.validity
-        }, function(results) {
-            if (result.insertId)
-                callback(result.insertId);
-            else
-                callback(false);
-        });
+            validity: quotation.validity,
+            language: quotation.language
+    }, function(results) {
+            if (results.insertId) {
+                callback(true);
+            } else {
+                callback(false, results);
+            }
+    });
 }
 
 function computeTotal(tasks) {

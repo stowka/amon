@@ -10,6 +10,8 @@ USE `Amon`;
 
 SET autocommit = 0;
 
+START TRANSACTION;
+
 --
 -- Procedures
 --
@@ -486,3 +488,5 @@ CREATE TABLE detail (
 --
 -- 
 --
+
+COMMIT;
