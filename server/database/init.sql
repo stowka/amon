@@ -445,6 +445,8 @@ CREATE TABLE quotation (
     `currency`         INT NOT NULL,
     `date_of_creation` DATE NOT NULL,
     `date_of_validity` DATE NOT NULL,
+    `last_updated`     DATETIME NOT NULL,
+    `last_generated`   DATETIME DEFAULT NULL,
     `language`         VARCHAR(5) NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_quotation_vendor_contact`

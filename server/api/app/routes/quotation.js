@@ -8,23 +8,33 @@ router.use(bodyParser.json());
 
 router.get('/pdf/:id', function(req, res, next) {
     var id = req.params.id;
+    var filename = '/tmp/quotation_' + id + '.pdf';
+    var sendPDF = function() {
+        fs.readFile(filename, function(err, file) {
+            if (err) {
+                res.status(200);
+                res.json(err);
+            } else {
+                res.writeHeader(200, {'contentType': 'application/pdf'});
+                res.end(file);
+            }
+        });
+    };
     
-    quotation.generatePdf(id, function(success, data) {
-        if(success) {
-            var filename = 'quotation_' + req.params.id + '.pdf';
-            fs.readFile(filename, function(err, file) {
-                if (err) {
-                    res.status(200);
-                    res.json({error : 1, message : "No such file! (" + file + ")"});
-                } else {
-                    res.writeHeader(200, {'contentType': 'application/pdf'});
-                    res.end(file);
-                }
-            });
-        } else {
-            res.status(200);
-            res.json({error : 1, message : "Couldn't generate PDF!"});
-        }
+    fs.exists(filename, function(exists) { 
+        quotation.upToDate(id, function(upToDate) {
+            if(exists && upToDate) {
+                sendPDF();
+            } else {
+                quotation.generatePdf(id, function(success, data) {
+                    if(success) {
+                        sendPDF();
+                    } else {
+                        res.sendStatus(404);
+                    }
+                });
+            }
+        });
     });
 });
 
@@ -85,7 +95,8 @@ router.get('/delete/:id', function(req, res, next) {
 router.post('/create', function(req, res, next) {
     quotation.storeQuotation(req.body, function(success, data) {
         if(success) {
-            res.sendStatus(200);
+            res.status(200);
+            res.json(data);
         } else {
             res.status(400);
             res.json(data);

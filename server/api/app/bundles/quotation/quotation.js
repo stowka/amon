@@ -210,18 +210,22 @@ module.exports = {
                 //HTML to PDF
                 var pdf = require('html-pdf');
                 var options = {
-                    filename: 'quotation_' + idQuotation + '.pdf',
+                    filename: '/tmp/quotation_' + idQuotation + '.pdf',
                     format : 'letter'
                 };
                 pdf.create(html, options).toFile(function(err, res) {
-                    if (err) throw err;
-                    var data = {
-                        'quotation' : results[0][0],
-                        'vendor'    : results[1][0],
-                        'customer'  : results[2][0],
-                        'details'   : results[3],
-                    };
-                    callback(true, data);
+                    if (err) {
+                        callback(false, err);
+                    } else {
+                        var sql = 'UPDATE quotation SET last_generated = ' + 
+                            ':date WHERE id = :id;';
+                        database.execute(sql, {
+                            id   : idQuotation,
+                            date : new Date()
+                        }, function(results) {
+                            callback(true, res);
+                        });
+                    }
                 });
             } else {
                 callback(false, "No quotation found for this id");
@@ -263,6 +267,7 @@ module.exports = {
             language       : quotation.language
         }, function(results) {
             if(results.affectedRows === 1) {
+                quotationUpdated(line.quotation);
                 callback(true, results);
             } else {
                 callback(false, results);
@@ -285,10 +290,27 @@ module.exports = {
     },
 
     storeQuotationWithNewClient: function(quotation, client, callback) {
-        /*quotation.customer = TODO: Call to Contact bundle function that store the new client
-         *                        and return his id 
+        /*quotation.customer = TODO: 
+         * Call to Contact bundle function that store the new client
+         * and return his id 
          */
         store(quotation, callback);
+    },
+
+    upToDate: function(idQuotation, callback) {
+        var sql = 'SELECT unix_timestamp(last_updated) as last_updated, ' +
+                  '       unix_timestamp(last_generated) as last_generated ' +
+                  'FROM quotation ' + 
+                  'WHERE id = :id;';
+        database.execute(sql, {
+            id : idQuotation
+        }, function(results) {
+            if(parseInt(results[0].last_updated) <= parseInt(results[0].last_generated)) {
+                callback(true);
+            } else {
+                callback(false);
+            }
+        });
     },
 
     storeLine: function(line, callback) {
@@ -304,6 +326,7 @@ module.exports = {
             quotation   : line.quotation
         }, function(results) {
             if(results.affectedRows === 1) {
+                quotationUpdated(line.quotation);
                 callback(true);
             } else {
                 callback(false, results);
@@ -318,6 +341,7 @@ module.exports = {
             id : idLine
         }, function(results) {
             if(results.affectedRows === 1) {
+                quotationUpdated(line.quotation);
                 callback(true, results);
             } else {
                 callback(false, results);
@@ -340,6 +364,7 @@ module.exports = {
             quotation   : line.quotation
         }, function(results) {
             if(results.affectedRows === 1) {
+                quotationUpdated(line.quotation);
                 callback(true, data);
             } else {
                 callback(false, data);
@@ -383,6 +408,20 @@ function store(quotation, callback) {
             } else {
                 callback(false, results);
             }
+    });
+}
+
+function quotationUpdated(idQuotation) {
+    var validity = new Date();
+    validity.setDate(validity.getDate() + 30);
+    var sql = 'UPDATE quotation SET last_updated = :newDate, ' +
+              '                     date_of_validity = :newValidity ' +
+              'WHERE id = :id;';
+    database.execute(sql, {
+        id          : idQuotation,
+        newDate     : new Date(),
+        newValidity : validity
+    }, function(results) {
     });
 }
 

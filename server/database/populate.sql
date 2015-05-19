@@ -90,7 +90,7 @@ INSERT INTO misc VALUES ("signature", "en-GB",
 
 ----------------- quotation --------------------------------------
 INSERT INTO quotation VALUES (NULL, "Refonte complète du site internet www.arrowstudio.ch", 
-    1, 3, 1, 2, "2015-05-01", "2015-06-01", "fr-CH");
+    1, 3, 1, 2, "2015-05-01", "2015-06-01", "2015-05-01", NULL, "fr-CH");
 
 ----------------- detail -------------------------------------------
 INSERT INTO detail VALUES (NULL, "Application : Paiement", 10, 1, 250, 3, 1);
