@@ -104,6 +104,13 @@ router.post('/create', function(req, res, next) {
     });
 });
 
+router.post('/search', function(req, res, next) {
+    quotation.search(req.body, function(results) {
+        res.status(200);
+        res.json(results);
+    });
+});
+
 router.post('/line/create', function(req, res, next) {
     quotation.storeLine(req.body, function(success, data) {
         if(success) {

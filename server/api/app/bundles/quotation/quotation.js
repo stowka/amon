@@ -1,6 +1,7 @@
 //Public functions
 
-var database = require("../database/database.js");
+var database = require('../database/database.js');
+var squel = require('squel');
 
 module.exports = {
 
@@ -234,21 +235,54 @@ module.exports = {
     },
 
     readAll: function(callback) {
-        var sql = 'SELECT Q.id, Q.summary, Q.date_of_creation, ' +
-                  '       V.first_name as vendor_first_name, ' +
-                  '       V.last_name as vendor_last_name, ' +
-                  '       C.first_name as customer_first_name, ' +
-                  '       C.last_name as customer_last_game ' +
-                  'FROM quotation Q, contact V, contact C ' +
-                  'WHERE Q.vendor = V.id ' +
-                  'AND   Q.customer = C.id;';
+        var sql = squel.select()
+                       .from('quotation','q')
+                       .from('contact','v')
+                       .from('contact','c')
+                       .field('q.id').field('q.summary').field('q.date_of_creation')
+                       .field('v.first_name','vendor_first_name')
+                       .field('v.last_name','vendor_last_name')
+                       .field('c.first_name','customer_first_name')
+                       .field('c.last_name','customer_last_name')
+                       .where('q.vendor = v.id')
+                       .where('q.customer = c.id');
 
-        database.execute(sql, {}, function(results) {
+        database.execute(sql.toString(), {}, function(results) {
             if (!results.length) {
                 callback(false, err);
             } else {
                 callback(true, {quotation: results});
             }
+        });
+    },
+
+    search: function(data, callback) {
+        var sql = squel.select()
+                       .from('quotation','q')
+                       .from('contact','v')
+                       .from('contact','c')
+                       .field('q.id').field('q.summary').field('q.date_of_creation')
+                       .field('v.first_name','vendor_first_name')
+                       .field('v.last_name','vendor_last_name')
+                       .field('c.first_name','customer_first_name')
+                       .field('c.last_name','customer_last_name')
+                       .where('q.vendor = v.id')
+                       .where('q.customer = c.id');
+        if(data.summary) {
+            sql.where('q.summary like :summary');
+        }
+        if(data.date) {
+            sql.where('q.date_of_creation = :date');
+        }
+        if(data.after && data.before) {
+            sql.where('q.date_of_creation BETWEEN :after AND :before');
+        }
+        if(data.vendor) {
+            sql.where('q.vendor = :vendor');
+        }
+
+        database.execute(sql.toString(), data, function(results) {
+            callback(results);
         });
     },
 

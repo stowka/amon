@@ -31,18 +31,11 @@ BEGIN
     -- TODO add full access to this project for all users in groups
 END $$
 
-CREATE PROCEDURE set_subproject_access(IN subproject_id INT)
-
-BEGIN
-    SELECT "set_subproject_access" AS log;
-    -- TODO add full access to this subproject for all users in groups
-END $$
-
-CREATE PROCEDURE set_collaborator(IN user_id INT, IN subproject_id INT)
+CREATE PROCEDURE set_collaborator(IN user_id INT, IN project_id INT)
 
 BEGIN
     SELECT "set_collaborator" AS log;
-    -- TODO add full access to this subproject for this user
+    -- TODO add full access to this project for this user
 END $$
 
 DELIMITER ;
@@ -274,28 +267,22 @@ DELIMITER ;*/
 -- BEGIN
 -- projects
 --
-CREATE TABLE project (
-    `id`                INT AUTO_INCREMENT,
-    `name`              VARCHAR(31) NOT NULL,
-    `short_description` VARCHAR(63) DEFAULT "",
-    `long_description`  VARCHAR(2047) DEFAULT "",
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
-CREATE TABLE subproject (
+CREATE TABLE project (
     `id`          INT AUTO_INCREMENT,
-    `project`     INT NOT NULL,
     `name`        VARCHAR(31) NOT NULL,
+    `description` LONGTEXT NOT NULL,
+    `company`     INT NOT NULL,
     `github_repo` VARCHAR(63) DEFAULT "",
     `tag`         INT NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY (`tag`),
-    CONSTRAINT `fk_subproject_project`
-        FOREIGN KEY (`project`)
-        REFERENCES project(`id`)
+    CONSTRAINT `fk_project_company`
+        FOREIGN KEY (`company`)
+        REFERENCES company(`id`)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    CONSTRAINT `fk_subproject_tag`
+    CONSTRAINT `fk_project_tag`
         FOREIGN KEY (`tag`)
         REFERENCES tag(`id`)
         ON UPDATE CASCADE
@@ -304,16 +291,16 @@ CREATE TABLE subproject (
 
 CREATE TABLE collaborator (
     `user`       INT NOT NULL,
-    `subproject` INT NOT NULL,
-    PRIMARY KEY (`user`, `subproject`),
+    `project` INT NOT NULL,
+    PRIMARY KEY (`user`, `project`),
     CONSTRAINT `fk_collaborator_user`
         FOREIGN KEY (`user`)
         REFERENCES user(`id`)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    CONSTRAINT `fk_collaborator_subproject`
-        FOREIGN KEY (`subproject`)
-        REFERENCES subproject(`id`)
+    CONSTRAINT `fk_collaborator_project`
+        FOREIGN KEY (`project`)
+        REFERENCES project(`id`)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
@@ -334,21 +321,6 @@ CREATE TABLE project_access (
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 
-CREATE TABLE subproject_access (
-    `subproject` INT NOT NULL,
-    `user`       INT NOT NULL,
-    `access`     ENUM("f", "r", "w", "rw"),
-    CONSTRAINT `fk_subproject_access_subproject`
-        FOREIGN KEY (`subproject`)
-        REFERENCES subproject(`id`)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_subproject_access_user`
-        FOREIGN KEY (`user`)
-        REFERENCES user(`id`)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET="utf8";
 --
 -- projects
 -- END
@@ -448,6 +420,7 @@ CREATE TABLE quotation (
     `last_updated`     DATETIME NOT NULL,
     `last_generated`   DATETIME DEFAULT NULL,
     `language`         VARCHAR(5) NOT NULL,
+    `project`          INT DEFAULT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_quotation_vendor_contact`
         FOREIGN KEY (`vendor`)
@@ -463,7 +436,10 @@ CREATE TABLE quotation (
         REFERENCES currency(`id`),
     CONSTRAINT `fk_quotation_language`
         FOREIGN KEY (`language`)
-        REFERENCES language(`code`)
+        REFERENCES language(`code`),
+    CONSTRAINT `fk_quotation_project`
+        FOREIGN KEY (`project`)
+        REFERENCES project(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE detail (
