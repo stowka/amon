@@ -2,9 +2,6 @@ var express = require('express');
 var fs = require('fs');
 var router = express.Router();
 var quotation = require('../bundles/quotation/quotation');
-var bodyParser = require('body-parser');
-
-router.use(bodyParser.json());
 
 router.get('/pdf/:id', function(req, res, next) {
     var id = req.params.id;
@@ -39,6 +36,7 @@ router.get('/pdf/:id', function(req, res, next) {
 });
 
 router.get('/read/all', function(req, res, next) {
+    console.log(req.cookies);
     quotation.readAll(function(success, data) {
         if(success) {
             res.status(200);

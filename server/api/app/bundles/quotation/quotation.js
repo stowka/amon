@@ -251,6 +251,12 @@ module.exports = {
             if (!results.length) {
                 callback(false, err);
             } else {
+                for(var i = 0 ; i < results.length ; i++) {
+                    results[i].date_of_creation = 
+                        results[i].date_of_creation
+                                  .toJSON()
+                                  .match(/\d{4}-\d{2}-\d{2}/)[0];
+                }
                 callback(true, {quotation: results});
             }
         });
