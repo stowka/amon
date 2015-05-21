@@ -7,9 +7,10 @@
     "html-pdf": "^1.2.0",
     "jade": "^1.9.2",
     "jsreport": "^0.4.0",
-    "promise": "^7.0.1",
     "pdfkit": "^0.7.1",
-    "pdfkitjs": "^0.0.5"
+    "pdfkitjs": "^0.0.5",
+    "promise": "^7.0.1",
+    "squel": "^3.10.0"
   },
   "devDependencies": {},
   "scripts": {
