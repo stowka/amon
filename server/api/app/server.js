@@ -5,6 +5,7 @@
  * @digest starts the server and listens on port 8989
  */
 var express = require('express');
+var config = require('./config');
 var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -20,8 +21,11 @@ server.set('view engine', 'jade');
 
 server.use(function(req, res, next) {
     res.header('Access-Control-Allow-Credentials', 'true');
-    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    config.authorizedClients.forEach(function(object, index, array) {
+        res.header("Access-Control-Allow-Origin", object);
+    });
+    res.header("Access-Control-Allow-Headers", 
+            "Origin, X-Requested-With,Content-Type, Accept");
     next();
 });
 
@@ -56,7 +60,7 @@ server.use(function(err, req, res, next) {
     res.render('Error : ' + err.message)
 });
 
-server.listen(8989, function() {
-    console.log('Server is running on port 8989');
+server.listen(config.server.port, function() {
+    console.log('Server is running on port ' + config.server.port);
     console.log('Press Ctrl-C to kill the server');
 });
