@@ -34,10 +34,16 @@ INSERT INTO contact VALUES (NULL, 1, "Antoine", "De Gieter",
 ------------------ phone ------------------------------------------
 INSERT INTO phone VALUES (NULL, 41, "79 193 33 09");
 INSERT INTO phone VALUES (NULL, 41, "77 124 21 84");
+INSERT INTO phone VALUES (NULL, 41, "79 786 19 14");
+INSERT INTO phone VALUES (NULL, 33, "6 76 01 19 22");
+INSERT INTO phone VALUES (NULL, 33, "6 81 60 58 36");
 
 ------------------ contact_phone ----------------------------------
-INSERT INTO contact_phone VALUES (1,1);
-INSERT INTO contact_phone VALUES (3,2);
+INSERT INTO contact_phone VALUES (1, 1);
+INSERT INTO contact_phone VALUES (3, 2);
+INSERT INTO contact_phone VALUES (2, 3);
+INSERT INTO contact_phone VALUES (4, 5);
+INSERT INTO contact_phone VALUES (5, 4);
 
 ----------------- payment_method ----------------------------------
 INSERT INTO payment_method VALUES (NULL);
