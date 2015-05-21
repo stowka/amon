@@ -75,7 +75,7 @@ function displayMenu(callback) {
 }
 
 function displayBundle(bundle, callback) {
-    $("#body-contents").load("html/bundles/" + bundle + ".html", callback);
+    $("#body-contents").load("html/bundles/" + bundle + "/" + bundle + ".html", callback);
     switch (bundle) {
         case "quotations":
             Quotations.init(function() {

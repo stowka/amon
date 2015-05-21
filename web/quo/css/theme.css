@@ -9,13 +9,13 @@ body {
     right: -48px;
     top: -48px;
     bottom: -48px;
-    background-image: url(../img/backgrounds/fog.jpg);
+    background-image: url(../img/backgrounds/texture.jpg);
     background-size: cover;
-    -webkit-filter: blur(24px);
+    /*-webkit-filter: blur(24px);
     -moz-filter: blur(24px);
     -o-filter: blur(24px);
     -ms-filter: blur(24px);
-    filter: blur(24px);
+    filter: blur(24px);*/
 }
 
 #body-contents {

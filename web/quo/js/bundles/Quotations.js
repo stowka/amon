@@ -4,130 +4,145 @@
  */
 
 Quotations = {
-	all: [],
-	init: function(callback) {
-		this.readAll(function(data) {
-			this.all = data.quotation;
+    all: [],
 
-			$("#quotations-contents").html("");
+    init: function(callback) {
+        this.readAll(function(data) {
+            this.all = data.quotation;
 
-			for(var index in this.all) {
-				$("#quotations-contents").append(formatQuotationInList(this.all[index]));
-			}
+            $("#quotations-contents").html("");
 
-			if (callback)
-				callback(null);
-		});
-	},
+            for(var index in this.all) {
+                $("#quotations-contents").loadTemplate("html/bundles/quotations/quotation-simple.html", {
+                    id: this.all[index].id,
+                    summary: this.all[index].summary,
+                    date_of_creation: this.all[index].date_of_creation,
+                }, { append: true });
+            }
 
-	display: function(id) {
-		this.read(id, function(data) {
-			$("#quotations-contents").html("");
-			$("#quotations-contents").append(formatQuotation(data));
-		})
-	},
+            if (callback)
+                callback(null);
+        });
+    },
 
-	pdf: function(id) {
-		this.read(id, function() {
-			$("#quotations-contents").css("height", "360px");
-			new PDFObject({
-				url: "http://127.0.0.1:8989/quotation/pdf/" + id
-			}).embed("quotations-contents");
-			AlertHandler.success("quotations/pdf/" + id, "");
-		})
-	},
+    display: function(id) {
+        this.read(id, function(data) {
+            $("#quotations-contents").html("");
 
-	readAll: function(callback) {
-		AlertHandler.loading("quotations");
-		$.get("http://127.0.0.1:8989/quotation/read/all", function(data) {
-			AlertHandler.success("quotations/read/all", "");
-			if (callback)
-				callback(data);
-		}, "json");
-	},
+            $("#quotations-contents").loadTemplate("html/bundles/quotations/quotation-details.html", {
+                id: id,
+                summary: data.quotation.summary,
+                date_of_creation: data.quotation.date_of_creation,
+                date_of_validity: data.quotation.date_of_validity,
+                language: data.quotation.language,
+                currency: data.quotation.currency,
+                currencySymbol: data.quotation.currency_symbol,
+                paymentMethod: data.quotation.payment_method,
+                saler: data.vendor.first_name + ' ' + data.vendor.last_name,
+                customer: data.customer.first_name + ' ' + data.customer.last_name
+            }, {
+                success: function() {
+                    for (var index in data.details) {
+                        console.log(data.details[index]);
+                        $("#quotation-details").loadTemplate("html/bundles/quotations/quotation-line.html", {
+                             line: data.details[index].line,
+                             description: data.details[index].description,
+                             discount: data.details[index].discount,
+                             quantity: data.details[index].quantity,
+                             price: data.details[index].price,
+                             total: data.details[index].total_ht,
+                        }, { append: true });
+                    }
+                }
+            });
+        })
+    },
 
-	read: function(id, callback) {
-		AlertHandler.loading("quotations");
-		$.get("http://127.0.0.1:8989/quotation/read/" + id, function(data) {
-			AlertHandler.success("quotations/read/" + id, "");
-			if (callback)
-				callback(data);
-		}, "json");
-	},
+    edit: function(id) {
+        this.read(id, function(data) {
+            $("#quotations-contents").html("");
 
-	create: function(quotation, callback) {
-		AlertHandler.loading("quotations");
-		AlertHandler.success("quotations/create", "");
-	},
+            $("#quotations-contents").loadTemplate("html/bundles/quotations/quotation-edit.html", {
+                id: id,
+                summary: data.quotation.summary,
+                date_of_creation: data.quotation.date_of_creation,
+                date_of_validity: data.quotation.date_of_validity,
+                language: data.quotation.language,
+                currency: data.quotation.currency,
+                currencySymbol: data.quotation.currency_symbol,
+                paymentMethod: data.quotation.payment_method,
+                saler: data.vendor.first_name + ' ' + data.vendor.last_name,
+                customer: data.customer.first_name + ' ' + data.customer.last_name
+            }, {
+                success: function() {
+                    for (var index in data.details) {
+                        console.log(data.details[index]);
+                        $("#quotation-details").loadTemplate("html/bundles/quotations/quotation-line-form.html", {
+                             line: data.details[index].line,
+                             description: data.details[index].description,
+                             discount: data.details[index].discount,
+                             quantity: data.details[index].quantity,
+                             price: data.details[index].price,
+                             total: data.details[index].total_ht,
+                        }, { append: true });
+                    }
+                }
+            });
+        })
+    },
 
-	update: function(quotation, callback) {
-		AlertHandler.loading("quotations");
-		AlertHandler.success("quotations/update/" + quotation.id, "");
-	},
+    pdf: function(id) {
+        AlertHandler.loading("quotations");
+        $("#quotations-contents").loadTemplate("html/bundles/quotations/quotation-pdf.html", {
+            id: id
+        }, {
+            success: function() {
+                $(".quotation-pdf pdf").css("height", "360px");
+                new PDFObject({
+                    url: "http://" + Config.server.host + ":" + Config.server.port  + "/quotation/pdf/" + id
+                }).embed("pdf");
+                AlertHandler.success("quotations/pdf/" + id, "");
+            }
+        });
+    },
 
-	delete: function(id, callback) {
-		AlertHandler.loading("quotations");
-		AlertHandler.error("quotations/delete/" + id, "");
-	}
-}
+    readAll: function(callback) {
+        AlertHandler.loading("quotations");
+        $.get("http://" + Config.server.host + ":" + Config.server.port  + "/quotation/read/all", function(data) {
+            AlertHandler.success("quotations/read/all", "");
+            if (callback)
+                callback(data);
+        }, "json");
+    },
 
-function formatQuotationInList(quotation) {
-	return '<div class="quotation">'
-		+ '<h3>' + quotation.summary + '</h3>'
-		+ '<p>' + quotation.date_of_creation + '</p>'
-		+ '<h6>'
-		+ '[<a href="#" class="quotation-see" onclick="javascript:Quotations.display(' + quotation.id + ')">See</a> • '
-		+ '<a href="#" class="quotation-edit" onclick="javascript:Quotations.edit(' + quotation.id + ')">Edit</a> • '
-		+ '<a href="#" class="quotation-generate-pdf" onclick="javascript:Quotations.pdf(' + quotation.id + ')">PDF</a> • '
-		+ '<a href="#" class="text-danger quotation-delete" onclick="javascript:Quotations.delete(' + quotation.id + ')">Delete</a>]'
-		+ '</h6>'
-		+ '</div>';
-}
+    read: function(id, callback) {
+        AlertHandler.loading("quotations");
+        $.get("http://" + Config.server.host + ":" + Config.server.port  + "/quotation/read/" + id, function(data) {
+            AlertHandler.success("quotations/read/" + id, "");
+            if (callback)
+                callback(data);
+        }, "json");
+    },
 
-function formatQuotation(data) {
-	var html = '<div class="quotation">'
-		+ '<h3>' + data.quotation.summary + '</h3>'
-		+ '<p>' + data.quotation.date_of_creation + ' &rarr; '
-		+ data.quotation.date_of_validity + '</p>';
+    create: function(quotation, callback) {
+        AlertHandler.loading("quotations");
+        AlertHandler.success("quotations/create", "");
+    },
 
-	html += '<ul class="text-left">';
-	html += '<li>Language: <em>' + data.quotation.language + '</em></li>';
-	html += '<li>Currency: <em>' + data.quotation.currency + ' (' + data.quotation.currency_symbol + ')</em></li>';
-	html += '<li>Payment method: <em>' + data.quotation.payment_method + '</em></li>';
-	html += '<li>Vendor: <em>' + data.vendor.first_name + ' ' + data.vendor.last_name + '</em></li>';
-	html += '<li>Client: <em>' + data.customer.first_name + ' ' + data.customer.last_name + '</em></li>';
-	html += '</ul>';
-	
-	html += '<table class="table table-hover">';
-	// html += '<thead>';
-	// html += '<tr>';
-	// html += '<th class="text-left">#</th>';
-	// html += '<th class="text-left">Designation</th>';
-	// html += '<th class="text-left">Discount</th>';
-	// html += '<th class="text-left">Quantity</th>';
-	// html += '<th class="text-left">Price</th>';
-	// html += '<th class="text-left">Total</th>';
-	// html += '</tr>';
-	// html += '</thead>';
-	html += '<tbody>';
-	for (index in data.details) {
-		html += '<tr>';
-		for (jndex in data.details[index]) {
-			html += '<td class="text-left">';
-			html += data.details[index][jndex];
-			html += '<td>';
-		}
-		html += '<tr>';
-	}
-	html += '</tbody>';
-	html += '</table>';
+    update: function(quotation, callback) {
+        AlertHandler.loading("quotations");
+        AlertHandler.success("quotations/update/" + quotation.id, "");
+    },
 
-	html += '<h6>';
-	html += '[<a href="#" class="quotation-edit" onclick="javascript:Quotations.edit(' + data.quotation.id + ')">Edit</a> • ';
-	html += '<a href="#" class="quotation-generate-pdf" onclick="javascript:Quotations.pdf(' + data.quotation.id + ')">PDF</a> • ';
-	html += '<a href="#" class="text-danger quotation-delete" onclick="javascript:Quotations.delete(' + data.quotation.id + ')">Delete</a>]';
-	html += '</h6>';
-	
-	html += '</div>';
-	return html;
+    delete: function(id, callback) {
+        if (confirm("Delete quotation \"D/" + id + "\"?")) {
+            AlertHandler.loading("quotations");
+            $.get("http://" + Config.server.host + ":" + Config.server.port  + "/quotation/delete/" + id, function(data) {
+                AlertHandler.error("quotations/delete/" + id, "");
+                this.init();
+                if (callback)
+                    callback(data);
+            }, "json");
+        }
+    }
 }
