@@ -7,6 +7,8 @@
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 
 var routesQuotation = require('./routes/quotation');
 var routesAccess = require('./routes/access');
@@ -15,12 +17,16 @@ var server = express();
 
 server.set('view engine', 'jade');
 
+
 server.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
 
+server.use(bodyParser.json());
+server.use(cookieParser());
 server.use(logger('dev'));
 
 server.use('/quotation', routesQuotation);
