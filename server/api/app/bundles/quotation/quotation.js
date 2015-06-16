@@ -4,85 +4,15 @@ var database = require('../database/database.js');
 var squel = require('squel');
 
 module.exports = {
+    test: function() {
+        return getSqlQueries();
+    },
 
     read: function(idQuotation, callback) {
-        var sqlQuotation = {
-            query: "SELECT Q.id, Q.summary, PMT.label as payment_method, "
-                + "C.symbol as currency_symbol, CT.name as currency, "
-                + "Q.date_of_creation, Q.date_of_validity, Q.language "
-                + "FROM quotation Q, payment_method PM, "
-                + "payment_method_translation PMT, currency C, "
-                + "currency_translation CT WHERE Q.id = :id "
-                + "AND Q.payment_method = PM.id " 
-                + "AND PMT.payment_method = PM.id " 
-                + "AND PMT.language = Q.language " 
-                + "AND Q.currency = C.id " 
-                + "AND CT.currency = C.id " 
-                + "AND CT.language = Q.language;",
-            data: {
-                id: idQuotation
-            }
-        };
 
-        var sqlCustomer = {
-            query: "SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, " +
-                "P.country_code, P.number " +
-            "FROM quotation Q, contact C, title T, title_translation TT, phone P, " +
-                "contact_phone CP " +
-            "WHERE Q.id = :id " +
-            "AND Q.customer = C.id " +
-            "AND C.title = T.id " +
-            "AND TT.title = T.id " +
-            "AND TT.language = Q.language " + 
-            "AND CP.contact = C.id " + 
-            "AND CP.phone = P.id LIMIT 1; ",
-            data: {
-                id: idQuotation
-            }
-        };
-
-        var sqlVendor = {
-            query: 'SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, ' +
-                'P.country_code, P.number ' +
-            'FROM quotation Q, contact C, title T, title_translation TT, phone P,  ' +
-                'contact_phone CP ' +
-            'WHERE Q.id = :id ' +
-            'AND   Q.vendor = C.id ' +
-            'AND   C.title = T.id ' +
-            'AND   TT.title = T.id ' + 
-            'AND   TT.language = Q.language ' +
-            'AND   CP.contact = C.id ' +
-            'AND   CP.phone = P.id LIMIT 1; ',
-            data: {
-                id: idQuotation
-            }
-        };
-
-        var sqlDetail = {
-            query: 'SELECT D.line, D.description, D.discount, D.quantity, D.price, ' +
-                '(D.price * D.quantity * (1 - D.discount/100)) as total_ht ' +
-            'FROM quotation Q, detail D  ' +
-            'WHERE D.quotation = Q.id ' + 
-            'ORDER BY D.line;'
-        };
-
-        var sqlMisc = {
-            query: 'SELECT M.keyword, M.text ' + 
-            'FROM misc M, quotation Q ' + 
-            'WHERE Q.id = :id ' +
-            'AND   M.language = Q.language;',
-            data: {
-                id: idQuotation
-            }
-        };
-
-        var sqlQuery = sqlQuotation.query + sqlVendor.query + sqlCustomer.query 
-            + sqlDetail.query + sqlMisc.query;
-
-        database.execute(sqlQuery, {
-            id: idQuotation
-        },
-        function(results) {
+        var sql = getSqlQueries();
+        
+        database.execute(sql, { id: idQuotation }, function(results) {
             //If the quotation exists in the database
             if(results[0].length > 0) {
 
@@ -95,10 +25,12 @@ module.exports = {
                     formatDate(results[0][0].date_of_validity, results[0][0].language);
 
                 var data = {
-                    quotation   : results[0][0],
-                    vendor      : results[1][0],
-                    customer    : results[2][0],
-                    details     : results[3],
+                    quotation     : results[0][0],
+                    vendor        : results[1][0],
+                    customer      : results[2][0],
+                    details       : results[3],
+                    vendorPhone   : results[4][0],
+                    customerPhone : results[5][0],
                 };
 
                 callback(true, data);
@@ -106,88 +38,18 @@ module.exports = {
                 callback(false, "No quotation found for this id");
             }
         });
-
     },
     
     generatePdf: function (idQuotation, callback) {
 
-        var sqlQuotation = {
-            query: "SELECT Q.id, Q.summary, PMT.label as payment_method, "
-                + "C.symbol as currency_symbol, CT.name as currency, "
-                + "Q.date_of_creation, Q.date_of_validity, Q.language "
-                + "FROM quotation Q, payment_method PM, "
-                + "payment_method_translation PMT, currency C, "
-                + "currency_translation CT WHERE Q.id = :id "
-                + "AND Q.payment_method = PM.id " 
-                + "AND PMT.payment_method = PM.id " 
-                + "AND PMT.language = Q.language " 
-                + "AND Q.currency = C.id " 
-                + "AND CT.currency = C.id " 
-                + "AND CT.language = Q.language;",
-            data: {
-                id: idQuotation
-            }
-        };
+        var misc = squel.select()
+            .from('misc', 'm')
+            .join('quotation', 'q', 'q.language = m.language')
+            .where('q.id = :id');
 
-        var sqlCustomer = {
-            query: "SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, " +
-                "P.country_code, P.number " +
-            "FROM quotation Q, contact C, title T, title_translation TT, phone P, " +
-                "contact_phone CP " +
-            "WHERE Q.id = :id " +
-            "AND Q.customer = C.id " +
-            "AND C.title = T.id " +
-            "AND TT.title = T.id " +
-            "AND TT.language = Q.language " + 
-            "AND CP.contact = C.id " + 
-            "AND CP.phone = P.id LIMIT 1; ",
-            data: {
-                id: idQuotation
-            }
-        };
+        var sql = getSqlQueries()+ misc.toString() + ';';
 
-        var sqlVendor = {
-            query: 'SELECT TT.label as title, C.first_name, C.last_name, C.email, C.address, ' +
-                'P.country_code, P.number ' +
-            'FROM quotation Q, contact C, title T, title_translation TT, phone P,  ' +
-                'contact_phone CP ' +
-            'WHERE Q.id = :id ' +
-            'AND   Q.vendor = C.id ' +
-            'AND   C.title = T.id ' +
-            'AND   TT.title = T.id ' + 
-            'AND   TT.language = Q.language ' +
-            'AND   CP.contact = C.id ' +
-            'AND   CP.phone = P.id LIMIT 1; ',
-            data: {
-                id: idQuotation
-            }
-        };
-
-        var sqlDetail = {
-            query: 'SELECT D.line, D.description, D.discount, D.quantity, D.price, ' +
-                '(D.price * D.quantity * (1 - D.discount/100)) as total_ht ' +
-            'FROM quotation Q, detail D  ' +
-            'WHERE D.quotation = Q.id ' + 
-            'ORDER BY D.line;'
-        };
-
-        var sqlMisc = {
-            query: 'SELECT M.keyword, M.text ' + 
-            'FROM misc M, quotation Q ' + 
-            'WHERE Q.id = :id ' +
-            'AND   M.language = Q.language;',
-            data: {
-                id: idQuotation
-            }
-        };
-
-        var sqlQuery = sqlQuotation.query + sqlVendor.query + sqlCustomer.query 
-            + sqlDetail.query + sqlMisc.query;
-
-        database.execute(sqlQuery, {
-            id: idQuotation
-        },
-        function(results) {
+        database.execute(sql, { id: idQuotation }, function(results) {
             //If the quotation exists in the database
             if(results[0].length > 0) {
 
@@ -200,12 +62,14 @@ module.exports = {
                     formatDate(results[0][0].date_of_validity, results[0][0].language);
 
                 var html = generateHTML({
-                    'quotation' : results[0][0],
-                    'vendor'    : results[1][0],
-                    'customer'  : results[2][0],
-                    'details'   : results[3],
-                    'total'     : total,
-                    'misc'      : wrapMiscObject(results[4])
+                    'quotation'     : results[0][0],
+                    'vendor'        : results[1][0],
+                    'customer'      : results[2][0],
+                    'details'       : results[3],
+                    'vendorPhone'   : results[4][0],
+                    'customerPhone' : results[5][0],
+                    'total'         : total,
+                    'misc'          : wrapMiscObject(results[6])
                 });
 
                 //HTML to PDF
@@ -293,11 +157,16 @@ module.exports = {
     },
 
     update: function(quotation, callback) {
-        var sql = 'UPDATE quotation SET summary = :summary, vendor = :vendor, ' + 
-            'customer = :customer, payment_method = :payment_method, ' +
-            'currency = :currency, language = :language WHERE id = :id;';
+        var sql = squel.update()
+                       .set('summary', ':summary')
+                       .set('vendor', ':vendor')
+                       .set('customer', ':customer')
+                       .set('payment_method', ':payment_method')
+                       .set('currency', ':currency')
+                       .set('language', ':language')
+                       .where('id = :id');
 
-        database.execute(sql, {
+        database.execute(sql.toString(), {
             id             : quotation.id,
             summary        : quotation.summary, 
             vendor         : quotation.vendor, 
@@ -316,9 +185,11 @@ module.exports = {
     },
 
     remove: function(idQuotation, callback) {
-        var sql = "DELETE FROM quotation WHERE id = :id;";
+        var sql = squel.delete()
+                       .from('quotation')
+                       .where('id = :id');
 
-        database.execute(sql, {
+        database.execute(sql.toString(), {
             id: idQuotation
         }, function(results) {
             callback(true, results);
@@ -338,11 +209,13 @@ module.exports = {
     },
 
     upToDate: function(idQuotation, callback) {
-        var sql = 'SELECT unix_timestamp(last_updated) as last_updated, ' +
-                  '       unix_timestamp(last_generated) as last_generated ' +
-                  'FROM quotation ' + 
-                  'WHERE id = :id;';
-        database.execute(sql, {
+        var sql = squel.select()
+                       .from('quotation')
+                       .field('unix_timestamp(last_updated)', 'last_updated')
+                       .field('unix_timestamp(last_generated)', 'last_generated')
+                       .where('id = :id');
+            
+        database.execute(sql.toString(), {
             id : idQuotation
         }, function(results) {
             if(parseInt(results[0].last_updated) <= parseInt(results[0].last_generated)) {
@@ -354,10 +227,16 @@ module.exports = {
     },
 
     storeLine: function(line, callback) {
-        var sql = 'INSERT INTO detail VALUES (null, :description, ' + 
-                ':discount, :quantity, :price, :line, :quotation);';
+        var sql = squel.insert()
+                       .into('detail')
+                       .set('description', ':description')
+                       .set('discount', ':discount')
+                       .set('quantity', ':quantity')
+                       .set('price', ':price')
+                       .set('line', ':line')
+                       .set('quotation', ':quotation');
 
-        database.execute(sql, {
+        database.execute(sql.toString(), {
             description : line.description,
             discount    : line.discount,
             quantity    : line.quantity,
@@ -375,9 +254,11 @@ module.exports = {
     },
 
     removeLine: function(idLine, callback) {
-        var sql = 'DELETE FROM detail WHERE id = :id;';
+        var sql = squel.delete()
+                       .from('quotation')
+                       .where('id = :id');
 
-        database.execute(sql, {
+        database.execute(sql.toString(), {
             id : idLine
         }, function(results) {
             if(results.affectedRows === 1) {
@@ -390,11 +271,17 @@ module.exports = {
     },
 
     updateLine: function(line, callback) {
-        var sql = 'UPDATE detail SET description = :description, discount = :discount, '+
-            'quantity = :quantity, price = :price, line = :line, quotation = :quotation '+
-            'WHERE id = : id;';
+        var sql = squel.update()
+                       .table('detail')
+                       .set('description', ':description')
+                       .set('discount', ':discount')
+                       .set('quantity', ':quantity')
+                       .set('price', ':price')
+                       .set('line', ':line')
+                       .set('quotation', ':quotation')
+                       .where('id = :id');
 
-        database.execute(sql, {
+        database.execute(sql.toString(), {
             id          : line.id,
             description : line.description,
             discount    : line.discount,
@@ -413,9 +300,11 @@ module.exports = {
     },
 
     readLine: function(idLine, callback) {
-        var sql = 'SELECT * FROM detail WHERE id = :id;';
+        var sql = squel.select()
+                       .from('detail')
+                       .where('id = :id');
 
-        database.execute(sql, {
+        database.execute(sql.toString(), {
             id : idLine
         }, function(results) {
             if(results.length === 1) {
@@ -427,21 +316,114 @@ module.exports = {
     }
 };
 
+//Get all the usefull data from a quotation
+function getSqlQueries() {
+    
+    var quotation = squel.select()
+        .from('quotation', 'q')
+        .join('payment_method', 'pm', 'q.payment_method = pm.id')
+        .join('payment_method_translation', 'pmt', 'pm.id = pmt.payment_method')
+        .join('currency', 'c', 'c.id = q.currency')
+        .join('currency_translation', 'ct', 'ct.currency = c.id')
+        .field('q.id')
+        .field('q.summary')
+        .field('pmt.label', 'payment_method')
+        .field('c.symbol', 'currency_symbol')
+        .field('ct.name', 'currency')
+        .field('q.date_of_creation')
+        .field('q.date_of_validity')
+        .field('q.language')
+        .where('q.id = :id')
+        .where('pmt.language = q.language')
+        .where('ct.language = q.language');
+
+    var vendor = squel.select()
+        .from('contact', 'c')
+        .join('quotation', 'q', 'q.vendor = c.id')
+        .join('title', 't', 't.id = c.title')
+        .join('title_translation', 'tt', 'tt.title = t.id')
+        .field('tt.label', 'title')
+        .field('c.first_name')
+        .field('c.last_name')
+        .field('c.email')
+        .field('c.address')
+        .where('q.id = :id')
+        .where('tt.language = q.language');
+
+    var customer = squel.select()
+        .from('contact', 'c')
+        .join('quotation', 'q', 'q.customer = c.id')
+        .join('title', 't', 't.id = c.title')
+        .join('title_translation', 'tt', 'tt.title = t.id')
+        .field('tt.label', 'title')
+        .field('c.first_name')
+        .field('c.last_name')
+        .field('c.email')
+        .field('c.address')
+        .where('q.id = :id')
+        .where('tt.language = q.language');
+
+    var details = squel.select()
+        .from('detail', 'd')
+        .join('quotation', 'q', 'd.quotation = q.id')
+        .field('d.line')
+        .field('d.description')
+        .field('d.discount')
+        .field('d.quantity')
+        .field('d.price')
+        .field('(d.price * d.quantity * (1 - d.discount/100))', 'total_ht')
+        .order('d.line');
+
+    var vendorPhoneNumbers = squel.select()
+        .from('phone', 'p')
+        .join('contact', 'c', 'p.contact = c.id')
+        .join('quotation', 'q', 'q.vendor = c.id')
+        .field('country_code')
+        .field('number')
+        .where('q.id = :id');
+
+    var customerPhoneNumbers = squel.select()
+        .from('phone', 'p')
+        .join('contact', 'c', 'p.contact = c.id')
+        .join('quotation', 'q', 'q.customer = c.id')
+        .field('country_code')
+        .field('number')
+        .where('q.id = :id');
+
+
+    return quotation.toString() + ';' +
+           vendor.toString() + ';' +
+           customer.toString() + ';' +
+           details.toString() + ';' +
+           vendorPhoneNumbers.toString() + ';' +
+           customerPhoneNumbers.toString() + ';';
+}
+
 function store(quotation, callback) {
     quotation.today = new Date();
     quotation.validity = new Date();
     quotation.validity.setDate(quotation.validity.getDate() + 30);
 
-    database.execute('INSERT INTO quotation VALUES (null, :summary, :vendor, '
-        + ':customer, :payment_method, :currency, :today, :validity, :language);', {
-            summary: quotation.summary, 
-            vendor: quotation.vendor, 
-            customer: quotation.customer, 
-            payment_method: quotation.payment_method,
-            currency: quotation.currency, 
-            today: quotation.today, 
-            validity: quotation.validity,
-            language: quotation.language
+    var sql = squel.insert()
+                   .into('quotation')
+                   .set('summary', ':summary')
+                   .set('vendor', ':vendor')
+                   .set('customer', ':customer')
+                   .set('payment_method', ':payment_method')
+                   .set('currency', ':currency')
+                   .set('date_of_creation', ':today')
+                   .set('date_of_validity', ':validity')
+                   .set('language', ':language');
+
+    database.execute(sql.toString(), {
+        summary: quotation.summary, 
+        vendor: quotation.vendor, 
+        customer: quotation.customer, 
+        payment_method: quotation.payment_method,
+        currency: quotation.currency, 
+        today: quotation.today, 
+        validity: quotation.validity,
+        language: quotation.language
     }, function(results) {
             if (results.insertId) {
                 callback(true);
@@ -454,10 +436,13 @@ function store(quotation, callback) {
 function quotationUpdated(idQuotation) {
     var validity = new Date();
     validity.setDate(validity.getDate() + 30);
-    var sql = 'UPDATE quotation SET last_updated = :newDate, ' +
-              '                     date_of_validity = :newValidity ' +
-              'WHERE id = :id;';
-    database.execute(sql, {
+    var sql = squel.update()
+                   .table('quotation')
+                   .set('last_updated', ':newDate')
+                   .set('date_of_validity', ':newValidity')
+                   .where('where id = :id');
+
+    database.execute(sql.toString(), {
         id          : idQuotation,
         newDate     : new Date(),
         newValidity : validity

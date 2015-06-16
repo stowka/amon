@@ -100,24 +100,12 @@ CREATE TABLE phone (
     `id`           INT AUTO_INCREMENT,
     `country_code` VARCHAR(3) NOT NULL,
     `number`       VARCHAR(15) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
-
-CREATE TABLE contact_phone (
-    `contact` INT NOT NULL,
-    `phone`   INT NOT NULL,
-    PRIMARY KEY (`contact`, `phone`),
-    CONSTRAINT `fk_contact_phone_contact`
+    `contact`      INT NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_phone_contact`
         FOREIGN KEY (`contact`)
         REFERENCES contact(`id`)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_contact_phone_phone`
-        FOREIGN KEY (`phone`)
-        REFERENCES phone(`id`)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET="utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET="utf8";
 
 CREATE TABLE company (
     `id`      INT NOT NULL AUTO_INCREMENT,

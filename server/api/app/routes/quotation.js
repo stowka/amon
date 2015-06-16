@@ -3,6 +3,11 @@ var fs = require('fs');
 var router = express.Router();
 var quotation = require('../bundles/quotation/quotation');
 
+router.get('/test', function(req, res, next) {
+    res.status(200);
+    res.end(quotation.test());
+});
+
 router.get('/pdf/:id', function(req, res, next) {
     var id = req.params.id;
     var filename = '/tmp/quotation_' + id + '.pdf';
