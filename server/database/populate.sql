@@ -109,7 +109,7 @@ INSERT INTO bundle VALUES (NULL, "contacts", "Contacts", FALSE);
 INSERT INTO bundle VALUES (NULL, "history_of_communication",
     "History of Communication", FALSE);
 INSERT INTO bundle VALUES (NULL, "agenda", "Agenda", FALSE);
-INSERT INTO bundle VALUES (NULL, "quotations", "Quotations", TRUE);
+INSERT INTO bundle VALUES (NULL, "quotation", "Quotations", TRUE);
 INSERT INTO bundle VALUES (NULL, "projects", "Projects", FALSE);
 INSERT INTO bundle VALUES (NULL, "timeline", "Timeline", FALSE);
 INSERT INTO bundle VALUES (NULL, "overview", "Overview", FALSE);

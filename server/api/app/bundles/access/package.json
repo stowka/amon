@@ -12,6 +12,7 @@
   "author": "Antoine De Gieter",
   "license": "ISC",
   "dependencies": {
+    "squel": "^4.0.0",
     "string": "^3.1.1"
   }
 }

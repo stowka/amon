@@ -4,8 +4,18 @@ var database = require('../database/database.js');
 var squel = require('squel');
 
 module.exports = {
-    test: function() {
-        return getSqlQueries();
+    
+    permissions: {
+        'read'       : 'r',
+        'pdf'        : 'r',
+        'update'     : 'u',
+        'delete'     : 'd',
+        'search'     : 'r',
+        'create'     : 'c',
+        'createLine' : 'c',
+        'readLine'   : 'r',
+        'updateLine' : 'u',
+        'removeLine' : 'd',
     },
 
     read: function(idQuotation, callback) {

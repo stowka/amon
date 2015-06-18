@@ -8,8 +8,40 @@ var rand = require("./generate-hash.js");
 var S = require("string");
 var database = require("../database/database");
 var users_and_roles = require("../users-and-roles/users-and-roles");
+var squel = require('squel');
+var bundles = {
+    quotation : require('../quotation/quotation')
+};
 
 module.exports = {
+
+    testMiddleware: function(req, res, next) {
+        url = parseUrl(req.url);
+
+        if(url.bundle === 'access') {
+            next();
+        } else {
+
+            token = parseToken(req.cookies.token);
+
+            checkSession(token, function(identified) {
+                if(identified) {
+                    checkPermissions(token.id, url.bundle, url.method, 
+                            function(isGranted) {
+                                if(isGranted) {
+                                    next();
+                                } else {
+                                    res.status(400);
+                                    res.json({error: 'You are not allowed to do that'})
+                                }
+                            });
+                } else {
+                    res.status(400);
+                    res.json({error: 'You are not connected.'});
+                }
+            });
+        }
+    },
 
     // TODO check if such a session already exists with ip and user_agent 
     // in order to only update the matching row.
@@ -68,41 +100,49 @@ module.exports = {
     }
 }
 
-function route(user, bundle) {
+function checkPermissions(userId, bundle, method, callback) {
+    var sql = squel.select()
+        .from('user_access', 'ua')
+        .join('bundle', 'b', 'b.id = ua.bundle')
+        .join('user', 'u', 'u.id = ua.user')
+        .field('ua.mode')
+        .where('b.keyword = :bundle')
+        .where('u.id = :userId');
 
-}
-
-function checkAccess(user, bundle, method, callback) {
-    method = method.match(/^([cdru]{1})/);
-
-    database.execute("SELECT mode FROM user_access WHERE "
-        + "user = :user AND bundle = :bundle", {
-            user: user,
-            bundle: bundle
-        }, function(result) {
-            S.extendPrototype();
-            (!result.mode.contains(method[1])) && callback(3) 
-            || callback(false);
-            S.restorePrototype();
-        });
+    database.execute(sql.toString(), {
+        bundle : bundle,
+        userId : userId
+    }, function(results) {
+        if(tmp(results[0].mode, bundles[bundle].permissions[method])) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+    });
 }
 
 function checkSession(token, callback) {
     var id = token.id;
     var hash = token.hash;
-
-    database.execute("SELECT id FROM session WHERE "
-        + "user = :user AND token_hash = :token_hash", {
+    var sql = squel.select()
+        .from('session')
+        .field('id')
+        .where('user = :user')
+        .where('token_hash = :token_hash');
+    
+    database.execute(sql.toString(), {
             user: id,
             token_hash: hash
         }, function(result) {
-            (result.length !== 1) && callback(2) 
-            || callback(false);
+            result.length === 1 ? 
+                callback(true) :
+                callback(false);
         });
 }
 
 function parseToken(token) {
-    if (regex = token.match(/^([1-9][0-9]*):([0-9a-z]{40}$)/))
+    if (undefined != token && 
+            (regex = token.match(/^([1-9][0-9]*):([0-9a-z]{40}$)/)))
         return {
             id: regex[1],
             hash: regex[2]
@@ -112,4 +152,16 @@ function parseToken(token) {
             error: 1,
             message: "Invalid token"
         };
+}
+
+function parseUrl(url) {
+    var splitUrl = url.split('/');
+    return {
+        bundle : splitUrl[1],
+        method : splitUrl[2]
+    };
+}
+
+function tmp(permissions, requiredPermissions) {
+    return permissions.indexOf(requiredPermissions) > -1 ? true : false;
 }

@@ -10,6 +10,7 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var access = require('./bundles/access');
 
 var routesQuotation = require('./routes/quotation');
 var routesAccess = require('./routes/access');
@@ -30,6 +31,7 @@ server.use(function(req, res, next) {
 server.use(bodyParser.json());
 server.use(cookieParser());
 server.use(logger('dev'));
+server.use(access.testMiddleware);
 
 server.use('/quotation', routesQuotation);
 server.use('/access', routesAccess);

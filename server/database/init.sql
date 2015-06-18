@@ -211,7 +211,7 @@ CREATE TABLE membership (
 
 CREATE TABLE bundle (
     `id`        INT AUTO_INCREMENT,
-    `key`       VARCHAR(15) NOT NULL,
+    `keyword`       VARCHAR(15) NOT NULL,
     `name`      VARCHAR(31) NOT NULL,
     `activated` BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (`id`)

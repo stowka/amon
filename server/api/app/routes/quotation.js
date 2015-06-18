@@ -114,7 +114,7 @@ router.post('/search', function(req, res, next) {
     });
 });
 
-router.post('/line/create', function(req, res, next) {
+router.post('/createLine', function(req, res, next) {
     quotation.storeLine(req.body, function(success, data) {
         if(success) {
             res.status(200);
@@ -126,7 +126,7 @@ router.post('/line/create', function(req, res, next) {
     });
 });
 
-router.get('/line/read/:id', function(req, res, next) {
+router.get('/readLine/:id', function(req, res, next) {
     quotation.readLine(req.params.id, function(success, data) {
         if(success) {
             res.status(200);
@@ -138,7 +138,7 @@ router.get('/line/read/:id', function(req, res, next) {
     });
 });
 
-router.post('/line/update', function(req, res, next) {
+router.post('/updateLine', function(req, res, next) {
     quotation.updateLine(req.body, function(success, data) {
         if(success) {
             res.status(200);
@@ -150,7 +150,7 @@ router.post('/line/update', function(req, res, next) {
     });
 });
 
-router.get('/line/remove/:id', function(req, res, next) {
+router.get('/removeLine/:id', function(req, res, next) {
     quotation.removeLine(req.params.id, function(success, data) {
         if(success) {
             res.status(200);
